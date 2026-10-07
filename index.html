@@ -349,6 +349,7 @@
     table {
         width: 100%;
         min-width: 1100px;
+        table-layout: fixed;
         border-collapse: separate;
         border-spacing: 0;
         text-align: left;
@@ -1400,24 +1401,24 @@
         </div>
 
         <div class="table-container">
-            <table id="dispatchTable">
-                <thead>
-                    <tr>
-                        <th style="width: 36px; text-align: center;"><input type="checkbox" onclick="toggleSelectAll(this)" title="Select All"></th>
-                        <th style="width: 85px;" onclick="sortTable(1)">Team ⇅</th>
-                        <th style="width: 120px;" onclick="sortTable(2)">Distance ⇅</th>
-                        <th style="width: 140px;" onclick="sortTable(3)">Status ⇅</th>
-                        <th style="width: 140px;" onclick="sortTable(4)">WO # ⇅</th>
-                        <th style="width: 130px;" onclick="sortTable(5)">Facility ⇅</th>
-                        <th style="width: 120px;" onclick="sortTable(6)">Slot/Port ⇅</th>
-                        <th style="width: 200px;" onclick="sortTable(7)">Coordinates ⇅</th>
-                        <th style="width: 80px;" onclick="sortTable(8)">Ageing ⇅</th>
-                    </tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
-        </div>
+    <table id="dispatchTable">
+        <thead>
+            <tr>
+                <th style="width: 40px; text-align: center;"><input type="checkbox" onclick="toggleSelectAll(this)" title="Select All"></th>
+                <th onclick="sortTable(1)">Team ⇅</th>
+                <th onclick="sortTable(2)">Distance ⇅</th>
+                <th onclick="sortTable(3)">Status ⇅</th>
+                <th onclick="sortTable(4)">WO # ⇅</th>
+                <th onclick="sortTable(5)">Facility ⇅</th>
+                <th onclick="sortTable(6)">Slot/Port ⇅</th>
+                <th onclick="sortTable(7)">Coordinates ⇅</th>
+                <th onclick="sortTable(8)">Ageing ⇅</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
     </div>
 
     <div id="toast" class="toast"></div>

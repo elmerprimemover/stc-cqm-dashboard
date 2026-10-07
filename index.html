@@ -1,0 +1,1477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STC CQM - SECONDARY Dashboard</title>
+<style>
+    :root {
+        --bg-color: #0b0f19;
+        --surface-color: #111827;
+        --surface-card: #1f2937;
+        --border-color: #374151;
+        --text-main: #f9fafb;
+        --text-muted: #9ca3af;
+        --primary-blue: #38bdf8;
+        --badge-green-bg: rgba(34, 197, 94, 0.15);
+        --badge-green-text: #4ade80;
+        --badge-red-bg: rgba(239, 68, 68, 0.15);
+        --badge-red-text: #f87171;
+        --badge-purple-bg: rgba(168, 85, 247, 0.15);
+        --badge-purple-text: #c084fc;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Inter, system-ui, sans-serif; }
+    body { background-color: var(--bg-color); color: var(--text-main); padding: 12px; line-height: 1.2; }
+
+    /* Sticky top section: header + ELMER EMATA clock */
+    .sticky-top {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: var(--bg-color);
+        padding-bottom: 4px;
+        margin-bottom: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+
+    header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0;
+        border-bottom: 1px solid var(--border-color);
+        padding: 10px 0;
+        flex-wrap: wrap;
+        gap: 8px;
+        background: var(--bg-color);
+    }
+    h1 { font-size: 1.2rem; color: var(--primary-blue); font-weight: 700; display: flex; align-items: center; gap: 8px; letter-spacing: -0.02em; }
+    
+    .header-actions { display: flex; gap: 8px; align-items: center; }
+    .sync-badge { background: var(--badge-green-bg); color: var(--badge-green-text); padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; border: 1px solid rgba(34, 197, 94, 0.3); display: flex; align-items: center; gap: 6px; }
+
+    /* Navigation Tabs Bar */
+    .nav-tabs {
+        display: flex;
+        gap: 6px;
+        margin-top: 8px;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 6px;
+    }
+    .nav-tab-btn {
+        background: var(--surface-card);
+        color: var(--text-muted);
+        border: 1px solid var(--border-color);
+        padding: 5px 12px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .nav-tab-btn.active {
+        background: var(--primary-blue);
+        color: #0b0f19;
+        border-color: var(--primary-blue);
+    }
+    .nav-tab-btn:hover:not(.active) {
+        color: var(--text-main);
+        background: var(--border-color);
+    }
+
+    /* Page View Containers */
+    .page-view {
+        display: none;
+    }
+    .page-view.active {
+        display: block;
+        animation: cardFadeIn 0.3s ease forwards;
+    }
+
+    /* Modern Card Grid Dashboard Styles with Balanced Height Grid Alignment */
+    .summary-board-container {
+        background: var(--surface-color);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 14px;
+        margin-bottom: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+    .dash-top-header {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: var(--primary-blue);
+        margin-bottom: 14px;
+        letter-spacing: 0.03em;
+        cursor: pointer;
+        background: var(--bg-color);
+        padding: 8px 0 4px;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .dash-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+    @media (min-width: 1024px) {
+        .dash-grid { 
+            grid-template-columns: repeat(3, minmax(0, 1fr)); 
+            grid-auto-rows: minmax(88px, auto);
+        }
+    }
+    @media (max-width: 640px) {
+        .dash-grid { grid-template-columns: 1fr; }
+    }
+
+    @keyframes cardFadeIn {
+        from { opacity: 0; transform: translateY(12px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .team-card {
+        background: var(--surface-card);
+        border: 1px solid var(--border-color);
+        border-left: 4px solid var(--badge-green-text);
+        border-radius: 6px;
+        padding: 10px 12px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        animation: cardFadeIn 0.4s ease forwards;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .team-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(56, 189, 248, 0.15);
+    }
+    .team-card.rest-day {
+        border-left-color: var(--badge-red-text);
+    }
+    .team-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+    .team-card-title {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: var(--text-main);
+        letter-spacing: 0.03em;
+    }
+    .status-pill {
+        font-size: 0.62rem;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 4px;
+        text-transform: uppercase;
+    }
+    .status-pill.duty {
+        background: var(--badge-green-bg);
+        color: var(--badge-green-text);
+        border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+    .status-pill.rest {
+        background: var(--badge-red-bg);
+        color: var(--badge-red-text);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+    .team-metrics-row {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 4px;
+        text-align: center;
+    }
+    .metric-box {
+        background: rgba(11, 15, 25, 0.6);
+        border: 1px solid rgba(55, 65, 81, 0.5);
+        border-radius: 4px;
+        padding: 5px 2px;
+        transition: background 0.2s;
+    }
+    .metric-box:hover {
+        background: rgba(56, 189, 248, 0.1);
+        border-color: rgba(56, 189, 248, 0.3);
+    }
+    .metric-label {
+        font-size: 0.55rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        font-weight: 700;
+        margin-bottom: 2px;
+    }
+    .metric-val {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: var(--text-main);
+    }
+
+    .kpi-card {
+        background: var(--surface-card);
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        animation: cardFadeIn 0.4s ease forwards;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .kpi-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(56, 189, 248, 0.15);
+    }
+    .kpi-title {
+        font-size: 0.65rem;
+        color: var(--text-muted);
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-bottom: 6px;
+        letter-spacing: 0.05em;
+    }
+    .kpi-value {
+        color: var(--primary-blue);
+        font-size: 1.8rem;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        animation: pulseKpi 2s infinite ease-in-out;
+    }
+    @keyframes pulseKpi {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.03); }
+    }
+
+    .province-card {
+        background: var(--surface-card);
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        padding: 10px 12px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        grid-column: span 1;
+        grid-row: span 3;
+        animation: cardFadeIn 0.4s ease forwards;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .province-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(56, 189, 248, 0.15);
+    }
+    .province-card-title {
+        font-size: 0.65rem;
+        color: var(--text-muted);
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-bottom: 6px;
+        letter-spacing: 0.05em;
+    }
+    .province-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.75rem;
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+    .province-row:last-child { margin-bottom: 0; }
+    .prov-pills {
+        display: flex;
+        gap: 6px;
+    }
+    .prov-pill {
+        font-size: 0.62rem;
+        padding: 2px 5px;
+        border-radius: 3px;
+        font-weight: 700;
+    }
+    .prov-pill.pending { background: rgba(234, 179, 8, 0.15); color: #facc15; }
+    .prov-pill.dep { background: var(--badge-red-bg); color: var(--badge-red-text); }
+    .prov-pill.comp { background: var(--badge-green-bg); color: var(--badge-green-text); }
+
+    .controls-bar {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        margin-bottom: 12px;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+    .filter-group { display: flex; gap: 8px; flex-wrap: wrap; flex: 1; align-items: center; }
+    .search-box, .select-box, .form-control {
+        background: var(--surface-color);
+        border: 1px solid var(--border-color);
+        color: var(--text-main);
+        padding: 6px 10px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        outline: none;
+    }
+    .search-box { width: 220px; }
+    .search-box:focus, .select-box:focus, .form-control:focus { border-color: var(--primary-blue); }
+
+    .btn {
+        background: var(--primary-blue);
+        color: #0b0f19;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-weight: 700;
+        cursor: pointer;
+        font-size: 0.85rem;
+        transition: opacity 0.2s, transform 0.1s;
+    }
+    .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn:active { transform: scale(0.98); }
+    .btn-secondary { background: var(--surface-card); color: var(--text-main); border: 1px solid var(--border-color); }
+    .btn-success { background: #16a34a; color: #ffffff; }
+    .btn-success:hover { background: #15803d; }
+    .btn-sm { padding: 4px 8px; font-size: 0.75rem; }
+
+    .action-panel {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin-bottom: 10px;
+        background: var(--surface-color);
+        padding: 8px 12px;
+        border-radius: 6px;
+        border: 1px solid var(--border-color);
+        flex-wrap: wrap;
+    }
+
+    .dashboard-layout {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+
+    /* Embedded Data Entry inside the Summary Tab */
+    .form-container {
+        background: var(--surface-color);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3);
+        display: block;
+        max-width: 700px;
+        margin: 0 auto;
+        animation: cardFadeIn 0.3s ease forwards;
+    }
+    .form-container h3 { font-size: 0.95rem; color: var(--primary-blue); margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 6px; font-weight: 700; }
+    .form-group { margin-bottom: 10px; }
+    .form-group label { display: block; font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 3px; letter-spacing: 0.05em; font-weight: 700; }
+
+    .table-container {
+        width: 100%;
+        background: var(--surface-color);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        overflow: auto;
+        max-height: calc(100vh - 200px);
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3);
+    }
+    table {
+        width: 100%;
+        min-width: 1200px;
+        table-layout: fixed;
+        border-collapse: separate;
+        border-spacing: 0;
+        text-align: left;
+        font-size: 0.78rem;
+    }
+    th, td {
+        padding: 6px 8px;
+        border-bottom: 1px solid var(--border-color);
+        border-right: 1px solid rgba(55, 65, 81, 0.4);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        height: 34px;
+        vertical-align: middle;
+    }
+
+    th {
+        background: #0f172a;
+        color: var(--primary-blue);
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.7rem;
+        letter-spacing: 0.05em;
+        cursor: pointer;
+        user-select: none;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+    }
+    th:hover { background: #1e293b; color: #fff; }
+    tr { transition: background 0.15s ease; }
+    tr:hover { background: rgba(56, 189, 248, 0.08); }
+
+    .toast {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: var(--surface-card);
+        border: 1px solid var(--border-color);
+        color: var(--text-main);
+        padding: 10px 16px;
+        border-radius: 6px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        z-index: 9999;
+        display: none;
+        font-size: 0.85rem;
+    }
+    .toast.show { display: block; animation: fadeIn 0.25s ease; }
+    .toast.error { border-color: #f87171; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .txt-modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.75);
+        z-index: 10000;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+    }
+    .txt-modal-overlay.show { display: flex; }
+    .txt-modal {
+        background: var(--surface-color);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        width: 100%;
+        max-width: 520px;
+        padding: 16px;
+        box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5);
+    }
+    .txt-modal h3 { color: var(--primary-blue); font-size: 0.95rem; margin-bottom: 10px; font-weight: 700; }
+    .txt-modal textarea {
+        width: 100%;
+        min-height: 180px;
+        background: var(--bg-color);
+        color: var(--text-main);
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        padding: 10px;
+        font-family: 'Consolas', 'Courier New', monospace;
+        font-size: 0.8rem;
+        line-height: 1.4;
+        resize: vertical;
+        outline: none;
+    }
+    .txt-modal-actions { display: flex; gap: 8px; margin-top: 10px; }
+    .txt-modal-actions .btn { flex: 1; }
+
+    footer {
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 0.75rem;
+        border-top: 1px solid var(--border-color);
+        padding-top: 12px;
+        margin-top: 12px;
+        font-weight: 500;
+    }
+</style>
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbydElw-r1rMW6qmXGQqguDy3xNPZKmOGi2VqTpZ35ZupWrns929oxZCaGrXy0AKfrouGw/exec";
+
+    const RD_SCHEDULES = {
+        "ELMER EMATA": "MONDAY",
+        "TEAM 1": "FRIDAY",
+        "TEAM 2": "TUESDAY",
+        "RESCUE 1": "MONDAY",
+        "TEAM 3": "TUESDAY",
+        "TEAM 4": "WEDNESDAY",
+        "TEAM 5": "THURSDAY",
+        "TEAM 6": "FRIDAY"
+    };
+
+    document.addEventListener("DOMContentLoaded", function() {
+        setInterval(updateLiveClock, 1000);
+        document.getElementById("mainAppContent").classList.add("visible");
+        syncWithGoogleSheets();
+    });
+
+    function switchPage(pageId) {
+        document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-tab-btn').forEach(b => b.classList.remove('active'));
+
+        document.getElementById(pageId).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+
+    function isRestDay(entityName) {
+        const now = new Date();
+        const days = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
+        const currentDayName = days[now.getDay()];
+        
+        let normalizedKey = Object.keys(RD_SCHEDULES).find(k => k.replace(/\s+/g, '') === entityName.toUpperCase().replace(/\s+/g, ''));
+        if (normalizedKey) {
+            return RD_SCHEDULES[normalizedKey] === currentDayName;
+        }
+        return false;
+    }
+
+    function updateLiveClock() {
+        const now = new Date();
+        const clockEl = document.getElementById("liveClock");
+        if (clockEl) {
+            const days = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+            const monthsFull = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
+            
+            const ddd = days[now.getDay()];
+            const dd = String(now.getDate()).padStart(2, '0');
+            const mmmm = monthsFull[now.getMonth()];
+            const yy = String(now.getFullYear()).slice(-2);
+            
+            const dateStr = `${ddd}:${dd}:${mmmm}:${yy}`;
+            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            
+            clockEl.innerText = `ELMER EMATA — (${dateStr} ${timeStr})`;
+        }
+    }
+
+    function showToast(message, isError = false) {
+        const toast = document.getElementById("toast");
+        if (!toast) return;
+        toast.textContent = message;
+        toast.className = "toast show" + (isError ? " error" : "");
+        setTimeout(() => { toast.className = "toast"; }, 3500);
+    }
+
+    function toggleSelectAll(source) {
+        let checkboxes = document.querySelectorAll('.row-select');
+        checkboxes.forEach(cb => {
+            if (cb.closest('tr').style.display !== 'none') {
+                cb.checked = source.checked;
+            }
+        });
+    }
+
+    function copyToClipboard(text, successMessage) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast(successMessage);
+            }).catch(() => {
+                fallbackCopyText(text, successMessage);
+            });
+        } else {
+            fallbackCopyText(text, successMessage);
+        }
+    }
+
+    function fallbackCopyText(text, successMessage) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed";
+        textArea.style.top = "0";
+        textArea.style.left = "0";
+        textArea.style.opacity = "0";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+
+        try {
+            const successful = document.execCommand('copy');
+            if (successful) {
+                showToast(successMessage);
+            } else {
+                showToast("Failed to copy text.", true);
+            }
+        } catch (err) {
+            showToast("Clipboard error: " + err, true);
+        }
+        document.body.removeChild(textArea);
+    }
+
+    function copySelectedRows(formatType) {
+        let rows = document.querySelectorAll('#dispatchTable tbody tr');
+        let lines = [];
+
+        rows.forEach(tr => {
+            let cb = tr.querySelector('.row-select');
+            if (cb && cb.checked) {
+                let td = tr.getElementsByTagName('td');
+                let team = td[1] ? td[1].innerText.trim() : "";
+                let wo = td[4] ? td[4].innerText.trim() : "";
+                let facility = td[5] ? td[5].innerText.trim() : "";
+                let slotPort = td[6] ? td[6].innerText.trim() : "";
+                let coords = td[7] ? td[7].innerText.trim() : "";
+                let ageing = td[8] ? td[8].innerText.trim() : "";
+
+                if (formatType === 'dispatch') {
+                    let teamPrefix = team ? `${team}   ` : "";
+                    lines.push(`${teamPrefix}${wo}   ${facility}   ${slotPort}   ${coords}   ${ageing}`);
+                } else if (formatType === 'smp') {
+                    lines.push(`${wo}   ${facility}   ${slotPort}`);
+                } else if (formatType === 'wo') {
+                    lines.push(wo);
+                }
+            }
+        });
+
+        if (lines.length === 0) {
+            showToast("Please select at least one ticket using the checkboxes.", true);
+            return;
+        }
+
+        let textToCopy = lines.join("\n\n");
+        copyToClipboard(textToCopy, `📋 Copied ${lines.length} row(s) for ${formatType.toUpperCase()}`);
+    }
+
+    function copyElmerShiftSummary() {
+        const now = new Date();
+        
+        if (!rawTicketStore || rawTicketStore.length === 0) {
+            showToast("No ticket data available. Please sync first.", true);
+            return;
+        }
+
+        const dateFormattedStr = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + ' at ' + now.toLocaleTimeString();
+        const formattedDateHeader = `DATE : ${dateFormattedStr}`;
+
+        const teamNames = ["TEAM 1", "TEAM 2", "RESCUE 1", "TEAM 3", "TEAM 4", "TEAM 5", "TEAM 6"];
+        let teamStats = {};
+        teamNames.forEach(t => { 
+            teamStats[t] = { dispatch: 0, completed: 0, surveyed: 0, dependency: 0, pending: 0 }; 
+        });
+
+        let provStats = {
+            TARLAC: { pending: 0, dependency: 0, completed: 0, surveyed: 0, ageing: {} },
+            AURORA: { pending: 0, dependency: 0, completed: 0, surveyed: 0, ageing: {} },
+            "NUEVA ECIJA": { pending: 0, dependency: 0, completed: 0, surveyed: 0, ageing: {} }
+        };
+
+        rawTicketStore.forEach(ticket => {
+            let tName = (ticket.team || "").toUpperCase().trim();
+            if (tName === "RESCUE1") tName = "RESCUE 1";
+            let matchedTeam = teamNames.find(tn => tName.includes(tn));
+            let statType = classifyStatus(ticket.status);
+            let prov = (ticket.province || "").toUpperCase().trim();
+            let ageingVal = (ticket.ageing || "").toUpperCase().trim() || "UNKNOWN";
+
+            if (matchedTeam) {
+                teamStats[matchedTeam].dispatch++;
+
+                if (statType === "completed") teamStats[matchedTeam].completed++;
+                else if (statType === "surveyed") teamStats[matchedTeam].surveyed++;
+                else if (statType === "dependency") teamStats[matchedTeam].dependency++;
+                else {
+                    teamStats[matchedTeam].pending++;
+                }
+            }
+
+            let pKey = Object.keys(provStats).find(pk => prov.includes(pk));
+            if (pKey) {
+                if (statType === "completed") {
+                    provStats[pKey].completed++;
+                } else if (statType === "dependency") {
+                    provStats[pKey].dependency++;
+                    provStats[pKey].pending++;
+                } else if (statType === "surveyed") {
+                    provStats[pKey].surveyed++;
+                    provStats[pKey].pending++;
+                } else {
+                    provStats[pKey].pending++;
+                }
+
+                if (!provStats[pKey].ageing[ageingVal]) {
+                    provStats[pKey].ageing[ageingVal] = 0;
+                }
+                provStats[pKey].ageing[ageingVal]++;
+            }
+        });
+
+        let lines = [];
+        lines.push(formattedDateHeader);
+        lines.push("DISPATCH SUMMARY:");
+        
+        let elmerRest = isRestDay("ELMER EMATA");
+        if (!elmerRest) {
+            lines.push("ELMER EMATA DUTY");
+        }
+
+        teamNames.forEach(tName => {
+            let rest = isRestDay(tName);
+            if (rest) {
+                lines.push(`${tName} -> REST DAY`);
+            } else {
+                let stats = teamStats[tName];
+                let prefix = (tName === "RESCUE 1") ? "RESCUE 1 -> DUTY  " : `${tName} ->   DUTY `;
+                lines.push(`${prefix}Dispatch: ${stats.dispatch} | Completed: ${stats.completed} | Pending: ${stats.pending}`);
+            }
+        });
+
+        lines.push("");
+        lines.push("PROVINCIAL PENDING & AGEING:");
+        Object.keys(provStats).forEach(prov => {
+            let p = provStats[prov];
+            let ageingSummary = Object.entries(p.ageing)
+                .map(([k, v]) => `${k}:${v}`)
+                .join(" | ");
+
+            lines.push(`${prov}: Pending = ${p.pending} | Dep = ${p.dependency} | Survey = ${p.surveyed} | Comp = ${p.completed}`);
+            lines.push(`   Ageing -> ${ageingSummary || 'None'}`);
+        });
+
+        let textToCopy = lines.join("\n");
+        copyToClipboard(textToCopy, `📋 Shift summary with ageing copied!`);
+    }
+
+    function filterTable() {
+        let keyword = document.getElementById("searchInput").value.toUpperCase();
+        let provinceVal = document.getElementById("provinceFilter").value.toUpperCase();
+        let statusVal = document.getElementById("statusFilter").value.toUpperCase();
+        
+        let table = document.getElementById("dispatchTable");
+        let tr = table.getElementsByTagName("tr");
+
+        for (let i = 1; i < tr.length; i++) {
+            let td = tr[i].getElementsByTagName("td");
+            if (td.length > 0) {
+                let rowText = tr[i].textContent || tr[i].innerText;
+                let statusText = td[3] ? td[3].innerText : "";
+
+                let matchesKeyword = rowText.toUpperCase().indexOf(keyword) > -1;
+                let matchesProvince = provinceVal === "" || rowText.toUpperCase().indexOf(provinceVal) > -1;
+                let matchesStatus = statusVal === "" || statusText.toUpperCase().includes(statusVal);
+
+                if (matchesKeyword && matchesProvince && matchesStatus) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+
+    let sortDirections = {};
+    function sortTable(colIndex) {
+        let table = document.getElementById("dispatchTable");
+        let tbody = table.tBodies[0];
+        let rows = Array.from(tbody.rows);
+        
+        sortDirections[colIndex] = !sortDirections[colIndex];
+        let asc = sortDirections[colIndex];
+
+        rows.sort((a, b) => {
+            let x = a.cells[colIndex] ? a.cells[colIndex].innerText.trim().toLowerCase() : "";
+            let y = b.cells[colIndex] ? b.cells[colIndex].innerText.trim().toLowerCase() : "";
+            if (x < y) return asc ? -1 : 1;
+            if (x > y) return asc ? 1 : -1;
+            return 0;
+        });
+
+        rows.forEach(row => tbody.appendChild(row));
+    }
+
+    function autoDetectStatus() {
+        let workload = document.getElementById("entryWorkload").value.toUpperCase();
+        let statusField = document.getElementById("entryStatus");
+        
+        if (workload.includes("DEPENDENCY") || workload.includes("LINKED")) {
+            statusField.value = "DEPENDENCY";
+        }
+    }
+
+    let matchedWoExact = null;
+    let matchedTicket = null;
+    let rawTicketStore = [];
+
+    function autoSearchTicketByWO(woQuery) {
+        let query = woQuery.trim().toUpperCase();
+        matchedWoExact = null;
+        matchedTicket = null;
+        const woInput = document.getElementById("entryWoSearch");
+        if (!query) {
+            woInput.style.borderColor = "var(--border-color)";
+            return;
+        }
+
+        let exactHit = null;
+        let partialHit = null;
+
+        rawTicketStore.forEach(ticket => {
+            let rowWo = (ticket.wo || "").trim();
+            if (!rowWo) return;
+            let rowWoUpper = rowWo.toUpperCase();
+
+            if (rowWoUpper === query) {
+                exactHit = ticket;
+            } else if (!partialHit && (rowWoUpper.startsWith(query) || rowWoUpper.includes(query))) {
+                partialHit = ticket;
+            }
+        });
+
+        const hit = exactHit || partialHit;
+        if (hit) {
+            matchedWoExact = hit.wo;
+            matchedTicket = hit;
+            woInput.value = hit.wo;
+            document.getElementById("entryStatus").value = hit.status || "";
+            document.getElementById("entryFacility").value = hit.troubleLocation || hit.affectedFacility || "";
+            
+            if (hit.team) {
+                let teamSelect = document.getElementById("entryTeam");
+                for (let i = 0; i < teamSelect.options.length; i++) {
+                    if (teamSelect.options[i].value.toUpperCase() === hit.team.toUpperCase().trim()) {
+                        teamSelect.selectedIndex = i;
+                        break;
+                    }
+                }
+            }
+
+            woInput.style.borderColor = "#4ade80";
+            return;
+        }
+
+        matchedWoExact = null;
+        matchedTicket = null;
+        woInput.style.borderColor = "#f87171";
+    }
+
+    function clearEntryForm() {
+        matchedWoExact = null;
+        matchedTicket = null;
+        document.getElementById("entryWoSearch").value = "";
+        document.getElementById("entryFacility").value = "";
+        document.getElementById("entryStatus").value = "";
+        document.getElementById("entryTeam").selectedIndex = 0;
+        document.getElementById("entryWorkload").selectedIndex = 0;
+        document.getElementById("entryMctOdn").selectedIndex = 0;
+        document.getElementById("entryPrimaryLastmile").selectedIndex = 0;
+        document.getElementById("entryContractor").selectedIndex = 0;
+        document.getElementById("entryFaultType").selectedIndex = 0;
+        document.getElementById("entryTroubleType").selectedIndex = 0;
+        document.getElementById("entryCauseOfTrouble").selectedIndex = 0;
+        document.getElementById("entrySegment").selectedIndex = 0;
+        document.getElementById("entryActionTaken").selectedIndex = 0;
+        document.getElementById("entryWoSearch").style.borderColor = "var(--border-color)";
+    }
+
+    function buildUpdateText(data) {
+        const wo = data.wo || "";
+        const fault = data.faultType || (matchedTicket && matchedTicket.faultType) || "";
+        const affectedFacility = (matchedTicket && matchedTicket.affectedFacility) || data.facility || "";
+        const troubleType = data.troubleType || (matchedTicket && matchedTicket.troubleType) || "";
+        const causeOfTrouble = data.causeOfTrouble || (matchedTicket && matchedTicket.causeOfTrouble) || "";
+        const troubleLocation = data.facility || (matchedTicket && matchedTicket.troubleLocation) || (matchedTicket && matchedTicket.facility) || "";
+        const segment = data.segment || (matchedTicket && matchedTicket.segment) || "";
+        const actionTaken = data.actionTaken || (matchedTicket && matchedTicket.actionTaken) || "";
+
+        const pipeLine = [fault, affectedFacility, troubleType, causeOfTrouble, troubleLocation, segment, actionTaken].join("|");
+
+        let rawStatus = (data.status || (matchedTicket && matchedTicket.status) || "").toUpperCase();
+        let materialsText = "";
+        let matMatch = rawStatus.match(/MATERIAL[S]?\s*USED[:\s]*(.*)/i);
+        if (matMatch) { materialsText = matMatch[1].trim(); }
+
+        let statusClean = rawStatus.replace(/MATERIAL[S]?\s*USED.*$/i, "").trim();
+        let statusLine = "STATUS: " + statusClean;
+        let materialsLine = materialsText ? "MATERIALS USED: " + materialsText : "";
+
+        const workload = data.workload || (matchedTicket && matchedTicket.workload) || " ";
+        const mctOdn = data.mctOdn || (matchedTicket && matchedTicket.mctOdn) || " ";
+        const primaryLastmile = data.primaryLastmile || (matchedTicket && matchedTicket.primaryLastmile) || " ";
+        const contractor = data.contractor || (matchedTicket && matchedTicket.contractor) || "";
+        
+        const teamUnique = (matchedTicket && matchedTicket.teamUnique) || "";
+        const lcp = (matchedTicket && matchedTicket.lcpCol) || "";
+        const nap = (matchedTicket && matchedTicket.napCol) || "";
+
+        const detailLine = [workload, mctOdn, primaryLastmile, contractor, teamUnique, lcp, nap].join("/");
+        const facilityCafac = (matchedTicket && matchedTicket.facility) || data.facility || "";
+        const slotPort = (matchedTicket && matchedTicket.slotPort) || "";
+        const checkLine = "CHECK PHYSICAL/FOR RESTORATION BY PRIMARY/AFFECTED/" + facilityCafac + (slotPort ? " " + slotPort : "");
+
+        let lines = ["WORKORDER: " + wo, pipeLine, statusLine];
+        if (materialsLine) { lines.push(materialsLine); }
+        lines.push("", detailLine, "", checkLine);
+        return lines.join("\n");
+    }
+
+    function showGeneratedTxt(text) {
+        document.getElementById("generatedTxt").value = text;
+        document.getElementById("txtModal").classList.add("show");
+    }
+
+    function closeTxtModal() {
+        document.getElementById("txtModal").classList.remove("show");
+    }
+
+    function copyGeneratedTxt() {
+        const ta = document.getElementById("generatedTxt");
+        ta.select();
+        copyToClipboard(ta.value, "📋 Text copied to clipboard");
+    }
+
+    async function saveNewEntry() {
+        let typedWo = document.getElementById("entryWoSearch").value.trim();
+        let facility = document.getElementById("entryFacility").value.trim();
+        let status = document.getElementById("entryStatus").value;
+        let team = document.getElementById("entryTeam").value;
+        let workload = document.getElementById("entryWorkload").value;
+        let mctOdn = document.getElementById("entryMctOdn").value;
+        let primaryLastmile = document.getElementById("entryPrimaryLastmile").value;
+        let contractor = document.getElementById("entryContractor").value;
+        let faultType = document.getElementById("entryFaultType").value;
+        let troubleType = document.getElementById("entryTroubleType").value;
+        let causeOfTrouble = document.getElementById("entryCauseOfTrouble").value;
+        let segment = document.getElementById("entrySegment").value;
+        let actionTaken = document.getElementById("entryActionTaken").value;
+        
+        if (!typedWo || !matchedWoExact) {
+            showToast("WO not found in the table. Paste an existing Work Order first.", true);
+            document.getElementById("entryWoSearch").style.borderColor = "#f87171";
+            return;
+        }
+        typedWo = matchedWoExact;
+        if (!team) team = (matchedTicket && matchedTicket.team) || "";
+        const slotPort = (matchedTicket && matchedTicket.slotPort) || "";
+
+        let payload = {
+            action: "save",
+            team: team,
+            status: status,
+            wo: typedWo,
+            affectedFacility: facility,
+            troubleLocation: facility
+        };
+        if (workload) payload.workload = workload;
+        if (mctOdn) payload.mctOdn = mctOdn;
+        if (primaryLastmile) payload.primaryLastmile = primaryLastmile;
+        if (contractor) payload.contractor = contractor;
+        if (faultType) payload.faultType = faultType;
+        if (troubleType) payload.troubleType = troubleType;
+        if (causeOfTrouble) payload.causeOfTrouble = causeOfTrouble;
+        if (segment) payload.segment = segment;
+        if (actionTaken) payload.actionTaken = actionTaken;
+
+        const generatedText = buildUpdateText({
+            wo: typedWo, status: status, facility: facility, workload: workload,
+            mctOdn: mctOdn, primaryLastmile: primaryLastmile, contractor: contractor,
+            faultType: faultType, troubleType: troubleType, causeOfTrouble: causeOfTrouble,
+            segment: segment, actionTaken: actionTaken, team: team, slotPort: slotPort
+        });
+
+        try {
+            await fetch(SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify(payload)
+            });
+
+            showToast("✅ Assigned & Updated WO " + typedWo + " on Google Sheets");
+            clearEntryForm();
+            showGeneratedTxt(generatedText);
+            setTimeout(() => syncWithGoogleSheets(), 2000);
+        } catch (error) {
+            console.error("Save failed:", error);
+            showToast("Failed to update ticket on Google Sheets.", true);
+        }
+    }
+
+    function classifyStatus(status) {
+        const s = String(status || "").toUpperCase().trim();
+        if (s.includes("DEPENDENCY") || s.includes("DEPENDENT")) return "dependency";
+        if (s.includes("COMPLETE") || s.includes("DONE") || s.includes("CLOSED") || s.includes("RESOLVED")) return "completed";
+        if (s.includes("SURVEY")) return "surveyed";
+        if (s.includes("LINE UP") || s.includes("LINEUP") || s === "") return "lineup";
+        return "other";
+    }
+
+    function renderSummaryBoard(tickets) {
+        const teamNames = ["TEAM 1", "TEAM 2", "RESCUE 1", "TEAM 3", "TEAM 4", "TEAM 5", "TEAM 6"];
+        let teamStats = {};
+        teamNames.forEach(t => { teamStats[t] = { dispatch: 0, completed: 0, surveyed: 0, dependency: 0 }; });
+
+        let provStats = {
+            TARLAC: { pending: 0, dependency: 0, completed: 0, surveyed: 0, ageing: {} },
+            AURORA: { pending: 0, dependency: 0, completed: 0, surveyed: 0, ageing: {} },
+            "NUEVA ECIJA": { pending: 0, dependency: 0, completed: 0, surveyed: 0, ageing: {} }
+        };
+
+        let completedOrPrimaryCount = 0;
+        let uniqueTeamsWithTicket = new Set();
+
+        tickets.forEach(ticket => {
+            let tName = (ticket.team || "").toUpperCase().trim();
+            if (tName === "RESCUE1") tName = "RESCUE 1";
+            let matchedTeam = teamNames.find(tn => tName.includes(tn));
+            let statType = classifyStatus(ticket.status);
+            let prov = (ticket.province || "").toUpperCase().trim();
+            let workload = (ticket.workload || "").toUpperCase();
+            let actionTaken = (ticket.actionTaken || "").toUpperCase();
+            let ageingVal = (ticket.ageing || "").toUpperCase().trim() || "UNKNOWN";
+
+            if (matchedTeam) {
+                teamStats[matchedTeam].dispatch++;
+                uniqueTeamsWithTicket.add(matchedTeam);
+
+                if (statType === "completed") teamStats[matchedTeam].completed++;
+                else if (statType === "surveyed") teamStats[matchedTeam].surveyed++;
+                else if (statType === "dependency") teamStats[matchedTeam].dependency++;
+            }
+
+            let isCompleted = (statType === "completed");
+            let isPrimaryEndorsement = workload.includes("PRIMARY") || actionTaken.includes("PRIMARY") || workload.includes("ENDORSE");
+            if (isCompleted || isPrimaryEndorsement) { completedOrPrimaryCount++; }
+
+            let pKey = Object.keys(provStats).find(pk => prov.includes(pk));
+            if (pKey) {
+                if (statType === "completed") {
+                    provStats[pKey].completed++;
+                } else if (statType === "dependency") {
+                    provStats[pKey].dependency++;
+                    provStats[pKey].pending++;
+                } else if (statType === "surveyed") {
+                    provStats[pKey].surveyed++;
+                    provStats[pKey].pending++;
+                } else {
+                    provStats[pKey].pending++;
+                }
+
+                if (!provStats[pKey].ageing[ageingVal]) {
+                    provStats[pKey].ageing[ageingVal] = 0;
+                }
+                provStats[pKey].ageing[ageingVal]++;
+            }
+        });
+
+        let teamCount = uniqueTeamsWithTicket.size;
+        let exactKPI = teamCount > 0 ? (completedOrPrimaryCount / teamCount).toFixed(2) : "1.00";
+
+        let gridHtml = '';
+
+        teamNames.forEach((tName, index) => {
+            let rest = isRestDay(tName);
+            let dutyClass = rest ? "rest" : "duty";
+            let dutyText = rest ? "REST DAY" : "DUTY";
+            let stats = teamStats[tName];
+            let cardClass = rest ? "team-card rest-day" : "team-card";
+            let animDelay = (index * 0.06) + 's';
+
+            gridHtml += `
+                <div class="${cardClass}" style="animation-delay: ${animDelay};">
+                    <div class="team-card-header">
+                        <span class="team-card-title">${tName}</span>
+                        <span class="status-pill ${dutyClass}">${dutyText}</span>
+                    </div>
+                    <div class="team-metrics-row">
+                        <div class="metric-box">
+                            <div class="metric-label">Dispatch</div>
+                            <div class="metric-val">${rest ? "-" : stats.dispatch}</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-label">Completed</div>
+                            <div class="metric-val">${rest ? "-" : stats.completed}</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-label">Surveyed</div>
+                            <div class="metric-val">${rest ? "-" : stats.surveyed}</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-label">Dependency</div>
+                            <div class="metric-val">${rest ? "-" : stats.dependency}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+
+        gridHtml += `
+            <div class="kpi-card" style="animation-delay: 0.42s;">
+                <div class="kpi-title">KPI Metric</div>
+                <div class="kpi-value" id="teamEffiValue">${exactKPI}</div>
+            </div>
+        `;
+
+        let provinceCardHtml = `
+            <div class="province-card" style="animation-delay: 0.48s; grid-row: span 3;">
+                <div class="province-card-title">Provincial Pending / Status & Ageing</div>
+        `;
+        
+        ["TARLAC", "AURORA", "NUEVA ECIJA"].forEach(prov => {
+            let pData = provStats[prov];
+            let ageingSummary = Object.entries(pData.ageing)
+                .map(([k, v]) => `${k}:${v}`)
+                .join(" | ");
+
+            provinceCardHtml += `
+                <div class="province-row" style="flex-direction: column; align-items: flex-start; margin-bottom: 8px; border-bottom: 1px solid rgba(55, 65, 81, 0.3); padding-bottom: 6px;">
+                    <div style="display: flex; justify-content: space-between; width: 100%; margin-bottom: 3px;">
+                        <span style="color: var(--primary-blue);">${prov}</span>
+                        <div class="prov-pills">
+                            <span class="prov-pill pending">Pending:${pData.pending}</span>
+                            <span class="prov-pill dep">Dep:${pData.dependency}</span>
+                            <span class="prov-pill" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8;">Survey:${pData.surveyed}</span>
+                            <span class="prov-pill comp">Comp:${pData.completed}</span>
+                        </div>
+                    </div>
+                    <div style="font-size: 0.65rem; color: var(--text-muted); font-weight: 600;">
+                        Ageing: <span style="color: var(--text-main);">${ageingSummary || 'None'}</span>
+                    </div>
+                </div>
+            `;
+        });
+        provinceCardHtml += `</div>`;
+        gridHtml += provinceCardHtml;
+
+        document.getElementById("dashGridContainer").innerHTML = gridHtml;
+    }
+
+    async function syncWithGoogleSheets() {
+        let badge = document.getElementById("syncStatus");
+        if (!badge) return;
+        badge.innerHTML = "⏳ Syncing with Google Sheets...";
+        
+        try {
+            let response = await fetch(SCRIPT_URL);
+            let data = await response.json();
+            
+            if (data.error) {
+                console.error("Apps Script Error:", data.error);
+                badge.innerHTML = "🔴 Script Error (Check Console)";
+                showToast("Script error: " + data.error, true);
+                return;
+            }
+            
+            rawTicketStore = data.tickets || [];
+            let tbody = document.getElementById("dispatchTable").getElementsByTagName('tbody')[0];
+            tbody.innerHTML = ""; 
+            
+            rawTicketStore.forEach((ticket, idx) => {
+                let row = tbody.insertRow();
+                
+                row.innerHTML = `
+                    <td style="text-align: center;"><input type="checkbox" class="row-select" data-index="${idx}"></td>
+                    <td>${ticket.team || ''}</td>
+                    <td>${ticket.drivingDistance || ''}</td>
+                    <td>${ticket.status || ''}</td>
+                    <td><strong>${ticket.wo || ''}</strong></td>
+                    <td>${ticket.facility || ''}</td>
+                    <td>${ticket.slotPort || ''}</td>
+                    <td>${ticket.coordinates || ''}</td>
+                    <td>${ticket.ageing || ''}</td>
+                `;
+            });
+
+            renderSummaryBoard(rawTicketStore);
+
+            let timeString = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            badge.innerHTML = `🟢 Live Synced: STC CQM Sheet (${timeString})`;
+            filterTable();
+        } catch (error) {
+            console.error("Sync failed:", error);
+            badge.innerHTML = "🔴 Sync Failed (Check Deployment)";
+            showToast("Sync failed. Check Apps Script deployment.", true);
+        }
+    }
+</script>
+</head>
+<body>
+
+<div id="mainAppContent" class="visible">
+    <div class="sticky-top">
+        <header>
+            <h1>STC CQM SECONDARY DISPATCH</h1>
+            <div class="header-actions">
+                <div class="sync-badge" id="syncStatus">🟢 Live Synced: STC CQM Sheet</div>
+                <button class="btn btn-secondary btn-sm" onclick="syncWithGoogleSheets()">🔄 Sync Now</button>
+            </div>
+        </header>
+        <div class="dash-top-header" id="liveClock" onclick="copyElmerShiftSummary()" title="Click to copy shift summary">ELMER EMATA — (WED:07:OCTOBER:26 11:49:55)</div>
+        
+        <div class="nav-tabs">
+            <button class="nav-tab-btn" onclick="switchPage('summaryReportPage')">📝 Data Entry & Update</button>
+            <button class="nav-tab-btn active" onclick="switchPage('dispatchBoardPage')">📊 Live Dispatch Dashboard</button>
+        </div>
+    </div>
+
+    <!-- PAGE 1: Data Entry & Update Tab -->
+    <div id="summaryReportPage" class="page-view">
+        <div class="form-container" id="dataEntryForm">
+            <h3>Update Existing Work Order</h3>
+            
+            <div class="form-group" style="background: var(--bg-color); padding: 8px; border-radius: 6px; border: 1px dashed var(--border-color);">
+                <label style="color: var(--primary-blue);">WORKORDER (PASTE TO AUTO SEARCH)</label>
+                <div style="display: flex; gap: 8px;">
+                    <input type="text" id="entryWoSearch" class="form-control" placeholder="Paste WO # here..." oninput="autoSearchTicketByWO(this.value)">
+                    <button class="btn btn-secondary btn-sm" onclick="clearEntryForm()" style="white-space: nowrap;">Clear</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>ASSIGN TO TEAM</label>
+                <select id="entryTeam" class="form-control">
+                    <option value="">Select Team</option>
+                    <option value="TEAM 1">TEAM 1</option>
+                    <option value="TEAM 2">TEAM 2</option>
+                    <option value="RESCUE 1">RESCUE 1</option>
+                    <option value="TEAM 3">TEAM 3</option>
+                    <option value="TEAM 4">TEAM 4</option>
+                    <option value="TEAM 5">TEAM 5</option>
+                    <option value="TEAM 6">TEAM 6</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>STATUS</label>
+                <input type="text" id="entryStatus" class="form-control" value="" placeholder="Type status..." style="color: var(--primary-blue); font-weight: bold;">
+            </div>
+
+            <div class="form-group">
+                <label>TROUBLE LOCATION</label>
+                <input type="text" id="entryFacility" class="form-control" placeholder="Enter trouble location...">
+            </div>
+
+            <div class="form-group">
+                <label>WORKLOAD</label>
+                <select id="entryWorkload" class="form-control" onchange="autoDetectStatus()">
+                    <option value="">Select Workload</option>
+                    <option value="SPLICING CORE @ NAP OR LCP">SPLICING CORE @ NAP OR LCP</option>
+                    <option value="CABLE LAYING (GREATER THAN 400M)">CABLE LAYING (GREATER THAN 400M)</option>
+                    <option value="CABLE LAYING (LESS THAN 400M)">CABLE LAYING (LESS THAN 400M)</option>
+                    <option value="CABLE LAYING (LESS THAN 400M) WITH NAP&LCP REPLACEMENT">CABLE LAYING (LESS THAN 400M) WITH NAP&LCP REPLACEMENT</option>
+                    <option value="CABLE LAYING (MORE THAN 400M) WITH NAP&LCP REPLACEMENT">CABLE LAYING (MORE THAN 400M) WITH NAP&LCP REPLACEMENT</option>
+                    <option value="CHANGE & SPLICING OF DILAPIDATED LCP OR NAP">CHANGE & SPLICING OF DILAPIDATED LCP OR NAP</option>
+                    <option value="COPPER WORKS">COPPER WORKS</option>
+                    <option value="ISOLATION & ENDORSE TO PRIMARY">ISOLATION & ENDORSE TO PRIMARY</option>
+                    <option value="ISOLATION OF HIGHLOSS">ISOLATION OF HIGHLOSS</option>
+                    <option value="LINKED ON OTHER TICKET">LINKED ON OTHER TICKET</option>
+                    <option value="NTF WITH TRUCKROLL">NTF WITH TRUCKROLL</option>
+                    <option value="NTF WITHOUT TRUCKROLL">NTF WITHOUT TRUCKROLL</option>
+                    <option value="REPLACED COUPLER">REPLACED COUPLER</option>
+                    <option value="SPLICING CORE @ CLOSURE">SPLICING CORE @ CLOSURE</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>MCT/ODN</label>
+                <select id="entryMctOdn" class="form-control">
+                    <option value="">Select MCT/ODN</option>
+                    <option value="ODN PT">ODN PT</option>
+                    <option value="MCT">MCT</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>FOR PRIMARY/LASTMILE</label>
+                <select id="entryPrimaryLastmile" class="form-control">
+                    <option value="">Select Primary/Lastmile</option>
+                    <option value="LAST MILE">LAST MILE</option>
+                    <option value="FOR PRIMARY">FOR PRIMARY</option>
+                    <option value="NA">NA</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>CONTRACTOR</label>
+                <select id="entryContractor" class="form-control">
+                    <option value="">Select Contractor</option>
+                    <option value="STC">STC</option>
+                    <option value="NA">NA</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Fault Type</label>
+                <select id="entryFaultType" class="form-control">
+                    <option value="">Select Fault Type</option>
+                    <option value="LOS">LOS</option>
+                    <option value="HIGHLOSS">HIGHLOSS</option>
+                    <option value="NTF">NTF</option>
+                    <option value="CPF">CPF</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Trouble Type</label>
+                <select id="entryTroubleType" class="form-control">
+                    <option value="">Select Trouble Type</option>
+                    <option value="No Trouble Found">No Trouble Found</option>
+                    <option value="Open Core">Open Core</option>
+                    <option value="Transposed">Transposed</option>
+                    <option value="High Attenuation">High Attenuation</option>
+                    <option value="Bent Fiber Core">Bent Fiber Core</option>
+                    <option value="Dirty Fiber / Fiber Issue">Dirty Fiber / Fiber Issue</option>
+                    <option value="Broken">Broken</option>
+                    <option value="Material Quality Issue">Material Quality Issue</option>
+                    <option value="Non-compliant Standard">Non-compliant Standard</option>
+                    <option value="Defective">Defective</option>
+                    <option value="No Record / Not yet broadcasted">No Record / Not yet broadcasted</option>
+                    <option value="Deteriorated FOC">Deteriorated FOC</option>
+                    <option value="Duplicate ticket">Duplicate ticket</option>
+                    <option value="NO TROUBLE FOUND">NO TROUBLE FOUND</option>
+                    <option value="Undetermined">Undetermined</option>
+                    <option value="Open NAP">Open NAP</option>
+                    <option value="Dilapidated">Dilapidated</option>
+                    <option value="Cut Cable">Cut Cable</option>
+                    <option value="Burn FOC">Burn FOC</option>
+                    <option value="Others">Others</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Cause of Trouble</label>
+                <select id="entryCauseOfTrouble" class="form-control">
+                    <option value="">Select Cause</option>
+                    <option value="Poor Installation">Poor Installation</option>
+                    <option value="ALO Issue">ALO Issue</option>
+                    <option value="Malicious Activity (MAN-MADE)">Malicious Activity (MAN-MADE)</option>
+                    <option value="Hit by truck / Sharp Object">Hit by truck / Sharp Object</option>
+                    <option value="Structural Burn / Electrical Discharge">Structural Burn / Electrical Discharge</option>
+                    <option value="LGU Work">LGU Work</option>
+                    <option value="Substandard Materials">Substandard Materials</option>
+                    <option value="Pole (broken, Leaning, Relocation, Installation)">Pole (broken, Leaning, Relocation, Installation)</option>
+                    <option value="Tools / Improper Handling">Tools / Improper Handling</option>
+                    <option value="Commercial Power Outage">Commercial Power Outage</option>
+                    <option value="Natural Disaster">Natural Disaster</option>
+                    <option value="Land Development Activity">Land Development Activity</option>
+                    <option value="Pest / Animal Damage">Pest / Animal Damage</option>
+                    <option value="Wrong Installation">Wrong Installation</option>
+                    <option value="Recording Discrepancy">Recording Discrepancy</option>
+                    <option value="Plant / Customer Complaint">Plant / Customer Complaint</option>
+                    <option value="Construction">Construction</option>
+                    <option value="Duplicate ticket">Duplicate ticket</option>
+                    <option value="NO TROUBLE FOUND">NO TROUBLE FOUND</option>
+                    <option value="STUCK CORE AT NAP/LCP">STUCK CORE AT NAP/LCP</option>
+                    <option value="Defective NAP Ports">Defective NAP Ports</option>
+                    <option value="Broken NAP">Broken NAP</option>
+                    <option value="Dilapidated NAP">Dilapidated NAP</option>
+                    <option value="Defective Coupler">Defective Coupler</option>
+                    <option value="Workmanship Issue">Workmanship Issue</option>
+                    <option value="Bad Splice">Bad Splice</option>
+                    <option value="Undetermined">Undetermined</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Segment</label>
+                <select id="entrySegment" class="form-control">
+                    <option value="">Select Segment</option>
+                    <option value="NAP-NAP">NAP-NAP</option>
+                    <option value="LCP-LCP">LCP-LCP</option>
+                    <option value="NAP-LCP">NAP-LCP</option>
+                    <option value="LCP-NAP">LCP-NAP</option>
+                    <option value="Actual NAP">Actual NAP</option>
+                    <option value="Actual LCP">Actual LCP</option>
+                    <option value="1st LCP-LCP">1st LCP-LCP</option>
+                    <option value="Beyond 1st LCP">Beyond 1st LCP</option>
+                    <option value="Closure">Closure</option>
+                    <option value="Tailing LCP">Tailing LCP</option>
+                    <option value="Tailing NAP">Tailing NAP</option>
+                    <option value="Not applicable">Not applicable</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Action Taken</label>
+                <select id="entryActionTaken" class="form-control">
+                    <option value="">Select Action Taken</option>
+                    <option value="No Action Taken">No Action Taken</option>
+                    <option value="Respliced / Fixed">Respliced / Fixed</option>
+                    <option value="Replaced">Replaced</option>
+                    <option value="Layout FOC">Layout FOC</option>
+                    <option value="Rerouted">Rerouted</option>
+                    <option value="Changed / Replacement">Changed / Replacement</option>
+                    <option value="Cleaned Fiber">Cleaned Fiber</option>
+                    <option value="Endorsed to Primary">Endorsed to Primary</option>
+                    <option value="Provisioning / Configuration">Provisioning / Configuration</option>
+                    <option value="Re-installation">Re-installation</option>
+                    <option value="Rework / Rearrangement">Rework / Rearrangement</option>
+                    <option value="Endorsed to Last mile">Endorsed to Last mile</option>
+                    <option value="Rehabilitation">Rehabilitation</option>
+                    <option value="Testing">Testing</option>
+                </select>
+            </div>
+
+            <div style="display: flex; gap: 8px; margin-top: 14px;">
+                <button class="btn" style="flex: 1;" onclick="saveNewEntry()">💾 Update Work Order Only</button>
+                <button class="btn btn-secondary" onclick="clearEntryForm()">Clear Form</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 2 (Default Active): Dispatch Dashboard Page -->
+    <div id="dispatchBoardPage" class="page-view active">
+        <div class="summary-board-container">
+            <div class="dash-grid" id="dashGridContainer"></div>
+        </div>
+
+        <div class="controls-bar">
+            <div class="filter-group">
+                <input type="text" id="searchInput" class="search-box" placeholder="Search WO#, Ticket, Location..." onkeyup="filterTable()">
+                <select id="provinceFilter" class="select-box" onchange="filterTable()" style="width: 140px;">
+                    <option value="">All Provinces</option>
+                    <option value="Tarlac">Tarlac</option>
+                    <option value="Nueva Ecija">Nueva Ecija</option>
+                    <option value="Aurora">Aurora</option>
+                </select>
+                <select id="statusFilter" class="select-box" onchange="filterTable()" style="width: 140px;">
+                    <option value="">All Statuses</option>
+                    <option value="LINE UP">LINE UP</option>
+                    <option value="DEPENDENCY">DEPENDENCY</option>
+                    <option value="COMPLETED">COMPLETED</option>
+                    <option value="SURVEYED">SURVEYED</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="action-panel">
+            <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Batch Copy Selected:</span>
+            <button class="btn btn-sm" style="background: #0ea5e9; color: #fff;" onclick="copySelectedRows('wo')">📋 Copy WO #</button>
+            <button class="btn btn-success btn-sm" onclick="copySelectedRows('dispatch')">📋 Copy Dispatch (WO, Facilities, Slot/Port, Coords, Ageing)</button>
+            <button class="btn btn-sm" style="background: #0284c7; color: #fff;" onclick="copySelectedRows('smp')">📋 Copy SMP (WO, Facilities, Slot/Port)</button>
+        </div>
+
+        <div class="dashboard-layout">
+            <div class="table-container">
+                <table id="dispatchTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px; text-align: center;"><input type="checkbox" onclick="toggleSelectAll(this)" title="Select All"></th>
+                            <th style="width: 90px;" onclick="sortTable(1)">Team ⇅</th>
+                            <th style="width: 140px;" onclick="sortTable(2)">Driving Distance ⇅</th>
+                            <th style="width: 160px;" onclick="sortTable(3)">Status ⇅</th>
+                            <th style="width: 150px;" onclick="sortTable(4)">WO # ⇅</th>
+                            <th style="width: 140px;" onclick="sortTable(5)">Facilities(CAFAC) ⇅</th>
+                            <th style="width: 130px;" onclick="sortTable(6)">Slot and Port ⇅</th>
+                            <th style="width: 220px;" onclick="sortTable(7)">Coordinates ⇅</th>
+                            <th style="width: 90px;" onclick="sortTable(8)">Ageing ⇅</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <div class="txt-modal-overlay" id="txtModal">
+        <div class="txt-modal">
+            <h3>Generated Update Text</h3>
+            <textarea id="generatedTxt" readonly></textarea>
+            <div class="txt-modal-actions">
+                <button class="btn" onclick="copyGeneratedTxt()">📋 Copy Text</button>
+                <button class="btn btn-secondary" onclick="closeTxtModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        STC CQM Operations &bull; North Luzon (Tarlac, Nueva Ecija, Aurora) &bull; SPOC-COORDINATOR Live Dashboard
+    </footer>
+</div>
+
+</body>
+</html>

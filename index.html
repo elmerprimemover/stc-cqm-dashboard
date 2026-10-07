@@ -356,15 +356,15 @@
         font-size: 0.75rem;
     }
     th, td {
-        padding: 6px 8px;
-        border-bottom: 1px solid var(--border-color);
-        border-right: 1px solid rgba(55, 65, 81, 0.4);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        height: 32px;
-        vertical-align: middle;
-    }
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--border-color);
+    border-right: 1px solid rgba(55, 65, 81, 0.4);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Automatically cuts off long text with '...' */
+    height: 32px;
+    vertical-align: middle;
+}
 
     th {
         background: #0f172a;
@@ -1404,15 +1404,15 @@
     <table id="dispatchTable">
         <thead>
             <tr>
-                <th style="width: 40px; text-align: center;"><input type="checkbox" onclick="toggleSelectAll(this)" title="Select All"></th>
-                <th onclick="sortTable(1)">Team ⇅</th>
-                <th onclick="sortTable(2)">Distance ⇅</th>
-                <th onclick="sortTable(3)">Status ⇅</th>
-                <th onclick="sortTable(4)">WO # ⇅</th>
-                <th onclick="sortTable(5)">Facility ⇅</th>
-                <th onclick="sortTable(6)">Slot/Port ⇅</th>
-                <th onclick="sortTable(7)">Coordinates ⇅</th>
-                <th onclick="sortTable(8)">Ageing ⇅</th>
+<th style="width: 40px; text-align: center;"><input type="checkbox" onclick="toggleSelectAll(this)" title="Select All"></th>
+<th style="width: 90px;" onclick="sortTable(1)">Team ⇅</th>
+<th style="width: 110px;" onclick="sortTable(2)">Distance ⇅</th>
+<th style="width: 110px;" onclick="sortTable(3)">Status ⇅</th>
+<th style="width: 130px;" onclick="sortTable(4)">WO # ⇅</th>
+<th style="width: 110px;" onclick="sortTable(5)">Facility ⇅</th>
+<th style="width: 100px;" onclick="sortTable(6)">Slot/Port ⇅</th>
+<th style="width: 140px;" onclick="sortTable(7)">Coordinates ⇅</th>
+<th style="width: 70px;" onclick="sortTable(8)">Ageing ⇅</th>
             </tr>
         </thead>
         <tbody>

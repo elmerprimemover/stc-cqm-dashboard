@@ -162,12 +162,6 @@
         100% { box-shadow: 0 0 5px rgba(56, 189, 248, 0.2), inset 0 0 5px rgba(56, 189, 248, 0.1); border-color: var(--border-color); }
     }
 
-    @keyframes lineScan {
-        0% { transform: translateX(-100%); opacity: 0.2; }
-        50% { opacity: 1; }
-        100% { transform: translateX(250%); opacity: 0.2; }
-    }
-
     .team-card {
         background: var(--surface-card);
         border: 1px solid var(--border-color);
@@ -179,6 +173,20 @@
         justify-content: space-between;
     }
     .team-card.rest-day, .team-card.absent-day { border-left-color: var(--badge-red-text); }
+    
+    .team-card.kpi-integrated {
+        border-left-color: var(--primary-blue);
+        background: linear-gradient(135deg, var(--surface-card) 0%, rgba(56, 189, 248, 0.05) 100%);
+    }
+    .team-card.kpi-integrated .kpi-inline-val {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: var(--primary-blue);
+        text-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+        text-align: center;
+        padding: 4px 0;
+    }
+
     .team-card-header {
         display: flex;
         justify-content: space-between;
@@ -220,38 +228,6 @@
     }
     .metric-label { font-size: 0.45rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 1px; }
     .metric-val { font-size: 0.68rem; font-weight: 700; color: var(--text-main); }
-
-    .kpi-card {
-        background: var(--surface-card);
-        border: 1px solid var(--border-color);
-        border-radius: 6px;
-        padding: 8px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        position: relative;
-        overflow: hidden;
-        animation: fiberPulseGlow 3s infinite ease-in-out;
-        grid-column: span 2;
-    }
-    @media (min-width: 768px) {
-        .kpi-card { grid-column: span 4; }
-    }
-    .kpi-card::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 40px;
-        height: 2px;
-        background: var(--primary-blue);
-        box-shadow: 0 0 8px var(--primary-blue);
-        animation: lineScan 2.5s infinite linear;
-    }
-    .kpi-title { font-size: 0.58rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 2px; }
-    .kpi-value { color: var(--primary-blue); font-size: 1.2rem; font-weight: 800; text-shadow: 0 0 10px rgba(56, 189, 248, 0.3); }
 
     /* ULTRA-COMPACT Provincial Block */
     .province-card {
@@ -962,7 +938,8 @@
         let exactKPI = teamCount > 0 ? (completedOrPrimaryCount / teamCount).toFixed(2) : "0.01";
         let gridHtml = '';
 
-        teamNames.forEach((tName, index) => {
+        // Render Team Cards
+        teamNames.forEach((tName) => {
             let isAbsent = absentInputVal.includes(tName);
             let rest = isRestDay(tName);
             let stats = teamStats[tName];
@@ -987,13 +964,18 @@
             `;
         });
 
+        // Render KPI Card integrated as a grid card alongside teams
         gridHtml += `
-            <div class="kpi-card">
-                <div class="kpi-title">KPI Metric</div>
-                <div class="kpi-value">${exactKPI}</div>
+            <div class="team-card kpi-integrated">
+                <div class="team-card-header">
+                    <span class="team-card-title">KPI METRIC</span>
+                    <span class="status-pill duty">OVERALL</span>
+                </div>
+                <div class="kpi-inline-val">${exactKPI}</div>
             </div>
         `;
 
+        // Render Provincial Block
         let provinceCardHtml = `
             <div class="province-card">
                 <div class="province-card-title">Provincial Pending / Status & Ageing</div>
@@ -1002,7 +984,7 @@
 
         ["TARLAC", "AURORA", "NUEVA ECIJA"].forEach(prov => {
             let pData = provStats[prov];
-            let ageingSummary = Object.entries(pData.ageing).map(([k, v] ) => `${k}:${v}`).join(" | ");
+            let ageingSummary = Object.entries(pData.ageing).map(([k, v]) => `${k}:${v}`).join(" | ");
             provinceCardHtml += `
                 <div class="prov-single-row">
                     <span class="prov-name-col">${prov}</span>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>STC CQM - SECONDARY Dashboard</title>
 <style>
     :root {
@@ -19,7 +19,7 @@
         --badge-red-text: #f87171;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Inter, system-ui, sans-serif; }
-    body { background-color: var(--bg-color); color: var(--text-main); padding: 8px; line-height: 1.25; overflow-x: hidden; }
+    body { background-color: var(--bg-color); color: var(--text-main); padding: 6px; line-height: 1.25; overflow-x: hidden; width: 100vw; max-width: 100%; }
 
     .sticky-top {
         position: sticky;
@@ -27,7 +27,7 @@
         z-index: 100;
         background: var(--bg-color);
         padding-bottom: 4px;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
         box-shadow: 0 4px 12px rgba(0,0,0,0.4);
     }
 
@@ -36,31 +36,31 @@
         justify-content: space-between;
         align-items: center;
         border-bottom: 1px solid var(--border-color);
-        padding: 8px 4px;
+        padding: 6px 4px;
         flex-wrap: wrap;
-        gap: 8px;
+        gap: 6px;
         background: var(--bg-color);
     }
-    h1 { font-size: 1.05rem; color: var(--primary-blue); font-weight: 700; display: flex; align-items: center; gap: 6px; letter-spacing: -0.02em; }
+    h1 { font-size: 0.95rem; color: var(--primary-blue); font-weight: 700; display: flex; align-items: center; gap: 6px; letter-spacing: -0.02em; }
     
     .header-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
-    .sync-badge { background: var(--badge-green-bg); color: var(--badge-green-text); padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; border: 1px solid rgba(34, 197, 94, 0.3); display: flex; align-items: center; gap: 4px; }
+    .sync-badge { background: var(--badge-green-bg); color: var(--badge-green-text); padding: 3px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: 600; border: 1px solid rgba(34, 197, 94, 0.3); display: flex; align-items: center; gap: 4px; }
 
     .nav-tabs {
         display: flex;
         gap: 6px;
-        margin-top: 6px;
+        margin-top: 4px;
         border-bottom: 1px solid var(--border-color);
-        padding-bottom: 6px;
+        padding-bottom: 4px;
         overflow-x: auto;
     }
     .nav-tab-btn {
         background: var(--surface-card);
         color: var(--text-muted);
         border: 1px solid var(--border-color);
-        padding: 6px 12px;
+        padding: 5px 10px;
         border-radius: 4px;
-        font-size: 0.75rem;
+        font-size: 0.72rem;
         font-weight: 700;
         cursor: pointer;
         white-space: nowrap;
@@ -81,14 +81,14 @@
         background: var(--surface-card);
         border: 1px solid var(--border-color);
         border-radius: 6px;
-        padding: 8px 10px;
-        margin-bottom: 10px;
+        padding: 6px 8px;
+        margin-top: 6px;
         display: flex;
         flex-direction: column;
-        gap: 4px;
+        gap: 3px;
     }
     .absent-control-box label {
-        font-size: 0.65rem;
+        font-size: 0.6rem;
         color: var(--text-muted);
         text-transform: uppercase;
         font-weight: 700;
@@ -102,10 +102,11 @@
         background: var(--bg-color);
         border: 1px solid var(--border-color);
         color: var(--text-main);
-        padding: 5px 8px;
+        padding: 4px 6px;
         border-radius: 4px;
-        font-size: 0.75rem;
+        font-size: 0.72rem;
         outline: none;
+        width: 100%;
     }
     .absent-input:focus { border-color: var(--primary-blue); }
 
@@ -116,15 +117,15 @@
         background: var(--surface-color);
         border: 1px solid var(--border-color);
         border-radius: 8px;
-        padding: 8px 10px;
-        margin-bottom: 10px;
+        padding: 6px 8px;
+        margin-bottom: 8px;
         box-shadow: 0 4px 12px rgba(0,0,0,0.5);
     }
     .dash-top-header {
-        font-size: 0.75rem;
+        font-size: 0.72rem;
         font-weight: 700;
         color: var(--primary-blue);
-        margin-bottom: 6px;
+        margin-bottom: 4px;
         letter-spacing: 0.03em;
         cursor: pointer;
         background: var(--bg-color);
@@ -134,14 +135,14 @@
     }
     .dash-grid {
         display: grid;
-        grid-template-columns: 1fr;
-        gap: 8px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px;
     }
-    @media (min-width: 640px) {
-        .dash-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    @media (min-width: 768px) {
+        .dash-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     }
-    @media (min-width: 1024px) {
-        .dash-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    @media (min-width: 1200px) {
+        .dash-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     }
 
     @keyframes cardFadeIn {
@@ -172,7 +173,7 @@
         border: 1px solid var(--border-color);
         border-left: 4px solid var(--badge-green-text);
         border-radius: 6px;
-        padding: 8px 10px;
+        padding: 6px 8px;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
@@ -182,14 +183,14 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 6px;
+        margin-bottom: 4px;
     }
-    .team-card-title { font-size: 0.75rem; font-weight: 700; color: var(--text-main); }
+    .team-card-title { font-size: 0.7rem; font-weight: 700; color: var(--text-main); }
     
     .status-pill {
-        font-size: 0.58rem;
+        font-size: 0.52rem;
         font-weight: 700;
-        padding: 2px 6px;
+        padding: 1px 4px;
         border-radius: 3px;
         text-transform: uppercase;
     }
@@ -208,23 +209,23 @@
     .team-metrics-row {
         display: grid;
         grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 3px;
+        gap: 2px;
         text-align: center;
     }
     .metric-box {
         background: rgba(11, 15, 25, 0.6);
         border: 1px solid rgba(55, 65, 81, 0.5);
         border-radius: 3px;
-        padding: 3px 2px;
+        padding: 2px 1px;
     }
-    .metric-label { font-size: 0.48rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 1px; }
-    .metric-val { font-size: 0.72rem; font-weight: 700; color: var(--text-main); }
+    .metric-label { font-size: 0.45rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 1px; }
+    .metric-val { font-size: 0.68rem; font-weight: 700; color: var(--text-main); }
 
     .kpi-card {
         background: var(--surface-card);
         border: 1px solid var(--border-color);
         border-radius: 6px;
-        padding: 10px;
+        padding: 8px;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -233,6 +234,10 @@
         position: relative;
         overflow: hidden;
         animation: fiberPulseGlow 3s infinite ease-in-out;
+        grid-column: span 2;
+    }
+    @media (min-width: 768px) {
+        .kpi-card { grid-column: span 4; }
     }
     .kpi-card::after {
         content: '';
@@ -245,61 +250,61 @@
         box-shadow: 0 0 8px var(--primary-blue);
         animation: lineScan 2.5s infinite linear;
     }
-    .kpi-title { font-size: 0.6rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 2px; }
-    .kpi-value { color: var(--primary-blue); font-size: 1.4rem; font-weight: 800; text-shadow: 0 0 10px rgba(56, 189, 248, 0.3); }
+    .kpi-title { font-size: 0.58rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 2px; }
+    .kpi-value { color: var(--primary-blue); font-size: 1.2rem; font-weight: 800; text-shadow: 0 0 10px rgba(56, 189, 248, 0.3); }
 
     /* ULTRA-COMPACT Provincial Block */
     .province-card {
         background: var(--surface-card);
         border: 1px solid var(--border-color);
         border-radius: 6px;
-        padding: 8px 10px;
+        padding: 6px 8px;
         display: flex;
         flex-direction: column;
-        grid-column: 1 / -1;
+        grid-column: span 2;
     }
-    @media (min-width: 1024px) {
-        .province-card { grid-column: span 3; }
+    @media (min-width: 768px) {
+        .province-card { grid-column: span 4; }
     }
     .province-card-title {
-        font-size: 0.68rem;
+        font-size: 0.65rem;
         color: var(--primary-blue);
         font-weight: 700;
         text-transform: uppercase;
-        margin-bottom: 6px;
+        margin-bottom: 4px;
         letter-spacing: 0.03em;
         border-bottom: 1px solid var(--border-color);
-        padding-bottom: 3px;
+        padding-bottom: 2px;
     }
     .province-rows-container {
         display: flex;
         flex-direction: column;
-        gap: 4px;
+        gap: 3px;
     }
     .prov-single-row {
         background: rgba(11, 15, 25, 0.7);
         border: 1px solid rgba(55, 65, 81, 0.5);
         border-radius: 4px;
-        padding: 4px 8px;
+        padding: 3px 6px;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 8px;
+        gap: 6px;
         flex-wrap: nowrap;
     }
     .prov-name-col {
         color: var(--primary-blue);
-        font-size: 0.72rem;
+        font-size: 0.68rem;
         font-weight: 700;
-        min-width: 90px;
+        min-width: 75px;
     }
     .prov-pills-col {
         display: flex;
-        gap: 3px;
+        gap: 2px;
         flex-shrink: 0;
     }
     .prov-pill {
-        font-size: 0.52rem;
+        font-size: 0.48rem;
         padding: 1px 3px;
         border-radius: 3px;
         font-weight: 700;
@@ -310,7 +315,7 @@
     .prov-pill.surv { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
 
     .prov-ageing-col {
-        font-size: 0.58rem;
+        font-size: 0.52rem;
         color: var(--text-muted);
         text-align: right;
         white-space: nowrap;
@@ -322,8 +327,8 @@
     .controls-bar {
         display: flex;
         flex-direction: column;
-        gap: 8px;
-        margin-bottom: 10px;
+        gap: 6px;
+        margin-bottom: 8px;
     }
     @media (min-width: 640px) {
         .controls-bar { flex-direction: row; justify-content: space-between; align-items: center; }
@@ -333,39 +338,39 @@
         background: var(--surface-color);
         border: 1px solid var(--border-color);
         color: var(--text-main);
-        padding: 6px 10px;
+        padding: 5px 8px;
         border-radius: 6px;
-        font-size: 0.8rem;
+        font-size: 0.75rem;
         outline: none;
         width: 100%;
     }
     @media (min-width: 640px) {
-        .search-box { width: 220px; }
-        .select-box { width: 130px; }
+        .search-box { width: 200px; }
+        .select-box { width: 120px; }
     }
 
     .btn {
         background: var(--primary-blue);
         color: #0b0f19;
         border: none;
-        padding: 6px 12px;
+        padding: 5px 10px;
         border-radius: 6px;
         font-weight: 700;
         cursor: pointer;
-        font-size: 0.8rem;
+        font-size: 0.75rem;
     }
     .btn:hover { opacity: 0.9; }
     .btn-secondary { background: var(--surface-card); color: var(--text-main); border: 1px solid var(--border-color); }
     .btn-success { background: #16a34a; color: #ffffff; }
-    .btn-sm { padding: 4px 8px; font-size: 0.72rem; }
+    .btn-sm { padding: 3px 6px; font-size: 0.68rem; }
 
     .action-panel {
         display: flex;
         flex-direction: column;
         gap: 6px;
-        margin-bottom: 10px;
+        margin-bottom: 8px;
         background: var(--surface-color);
-        padding: 8px;
+        padding: 6px 8px;
         border-radius: 6px;
         border: 1px solid var(--border-color);
     }
@@ -377,13 +382,13 @@
         background: var(--surface-color);
         border: 1px solid var(--border-color);
         border-radius: 8px;
-        padding: 12px;
+        padding: 10px;
         max-width: 700px;
         margin: 0 auto;
     }
-    .form-container h3 { font-size: 0.9rem; color: var(--primary-blue); margin-bottom: 10px; border-bottom: 1px solid var(--border-color); padding-bottom: 4px; font-weight: 700; }
-    .form-group { margin-bottom: 8px; }
-    .form-group label { display: block; font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 2px; font-weight: 700; }
+    .form-container h3 { font-size: 0.85rem; color: var(--primary-blue); margin-bottom: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 4px; font-weight: 700; }
+    .form-group { margin-bottom: 6px; }
+    .form-group label { display: block; font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 2px; font-weight: 700; }
 
     .table-container {
         width: 100%;
@@ -392,26 +397,26 @@
         border-radius: 8px;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
-        max-height: calc(100vh - 220px);
+        max-height: calc(100vh - 200px);
         box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3);
     }
     table {
         width: 100%;
-        min-width: 1100px;
+        min-width: 1000px;
         table-layout: fixed;
         border-collapse: separate;
         border-spacing: 0;
         text-align: left;
-        font-size: 0.75rem;
+        font-size: 0.72rem;
     }
     th, td {
-        padding: 6px 8px;
+        padding: 5px 6px;
         border-bottom: 1px solid var(--border-color);
         border-right: 1px solid rgba(55, 65, 81, 0.4);
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        height: 32px;
+        height: 28px;
         vertical-align: middle;
     }
     th {
@@ -419,7 +424,7 @@
         color: var(--primary-blue);
         font-weight: 700;
         text-transform: uppercase;
-        font-size: 0.68rem;
+        font-size: 0.65rem;
         cursor: pointer;
         position: sticky;
         top: 0;
@@ -429,21 +434,21 @@
 
     .toast {
         position: fixed;
-        bottom: 16px;
-        right: 16px;
-        left: 16px;
+        bottom: 12px;
+        right: 12px;
+        left: 12px;
         background: var(--surface-card);
         border: 1px solid var(--border-color);
         color: var(--text-main);
-        padding: 10px 14px;
+        padding: 8px 12px;
         border-radius: 6px;
         box-shadow: 0 10px 25px rgba(0,0,0,0.5);
         z-index: 9999;
         display: none;
-        font-size: 0.8rem;
+        font-size: 0.75rem;
         text-align: center;
     }
-    @media (min-width: 640px) { .toast { left: auto; max-width: 350px; text-align: left; } }
+    @media (min-width: 640px) { .toast { left: auto; max-width: 320px; text-align: left; } }
     .toast.show { display: block; }
     .toast.error { border-color: #f87171; }
 
@@ -455,7 +460,7 @@
         z-index: 10000;
         align-items: center;
         justify-content: center;
-        padding: 12px;
+        padding: 10px;
     }
     .txt-modal-overlay.show { display: flex; }
     .txt-modal {
@@ -463,31 +468,31 @@
         border: 1px solid var(--border-color);
         border-radius: 8px;
         width: 100%;
-        max-width: 500px;
-        padding: 12px;
+        max-width: 480px;
+        padding: 10px;
     }
-    .txt-modal h3 { color: var(--primary-blue); font-size: 0.9rem; margin-bottom: 8px; }
+    .txt-modal h3 { color: var(--primary-blue); font-size: 0.85rem; margin-bottom: 6px; }
     .txt-modal textarea {
         width: 100%;
-        min-height: 160px;
+        min-height: 140px;
         background: var(--bg-color);
         color: var(--text-main);
         border: 1px solid var(--border-color);
         border-radius: 6px;
-        padding: 8px;
+        padding: 6px;
         font-family: monospace;
-        font-size: 0.78rem;
+        font-size: 0.75rem;
     }
-    .txt-modal-actions { display: flex; gap: 6px; margin-top: 8px; }
+    .txt-modal-actions { display: flex; gap: 6px; margin-top: 6px; }
     .txt-modal-actions .btn { flex: 1; }
 
     footer {
         text-align: center;
         color: var(--text-muted);
-        font-size: 0.7rem;
+        font-size: 0.65rem;
         border-top: 1px solid var(--border-color);
-        padding-top: 10px;
-        margin-top: 10px;
+        padding-top: 8px;
+        margin-top: 8px;
     }
 </style>
 <script>
@@ -997,7 +1002,7 @@
 
         ["TARLAC", "AURORA", "NUEVA ECIJA"].forEach(prov => {
             let pData = provStats[prov];
-            let ageingSummary = Object.entries(pData.ageing).map(([k, v]) => `${k}:${v}`).join(" | ");
+            let ageingSummary = Object.entries(pData.ageing).map(([k, v] ) => `${k}:${v}`).join(" | ");
             provinceCardHtml += `
                 <div class="prov-single-row">
                     <span class="prov-name-col">${prov}</span>
@@ -1187,7 +1192,7 @@
                     <option value="REPLACED CABLE">REPLACED CABLE</option>
                 </select>
             </div>
-            <div style="display: flex; gap: 6px; margin-top: 12px;">
+            <div style="display: flex; gap: 6px; margin-top: 10px;">
                 <button class="btn" style="flex: 1;" onclick="saveNewEntry()">💾 Update WO</button>
                 <button class="btn btn-secondary" onclick="clearEntryForm()">Clear</button>
             </div>
@@ -1220,7 +1225,7 @@
         </div>
 
         <div class="action-panel">
-            <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Batch Copy:</span>
+            <span style="font-size: 0.68rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Batch Copy:</span>
             <div style="display: flex; gap: 4px; flex-wrap: wrap;">
                 <button class="btn btn-sm" style="background: #0ea5e9; color: #fff;" onclick="copySelectedRows('wo')">📋 WO #</button>
                 <button class="btn btn-success btn-sm" onclick="copySelectedRows('dispatch')">📋 Dispatch Details</button>
@@ -1232,15 +1237,15 @@
             <table id="dispatchTable">
                 <thead>
                     <tr>
-                        <th style="width: 40px; text-align: center;"><input type="checkbox" onclick="toggleSelectAll(this)" title="Select All"></th>
-                        <th style="width: 90px;" onclick="sortTable(1)">Team ⇅</th>
-                        <th style="width: 110px;" onclick="sortTable(2)">Distance ⇅</th>
-                        <th style="width: 110px;" onclick="sortTable(3)">Status ⇅</th>
-                        <th style="width: 130px;" onclick="sortTable(4)">WO # ⇅</th>
-                        <th style="width: 110px;" onclick="sortTable(5)">Facility ⇅</th>
-                        <th style="width: 100px;" onclick="sortTable(6)">Slot/Port ⇅</th>
-                        <th style="width: 140px;" onclick="sortTable(7)">Coordinates ⇅</th>
-                        <th style="width: 70px;" onclick="sortTable(8)">Ageing ⇅</th>
+                        <th style="width: 38px; text-align: center;"><input type="checkbox" onclick="toggleSelectAll(this)" title="Select All"></th>
+                        <th style="width: 85px;" onclick="sortTable(1)">Team ⇅</th>
+                        <th style="width: 105px;" onclick="sortTable(2)">Distance ⇅</th>
+                        <th style="width: 105px;" onclick="sortTable(3)">Status ⇅</th>
+                        <th style="width: 125px;" onclick="sortTable(4)">WO # ⇅</th>
+                        <th style="width: 105px;" onclick="sortTable(5)">Facility ⇅</th>
+                        <th style="width: 95px;" onclick="sortTable(6)">Slot/Port ⇅</th>
+                        <th style="width: 130px;" onclick="sortTable(7)">Coordinates ⇅</th>
+                        <th style="width: 65px;" onclick="sortTable(8)">Ageing ⇅</th>
                     </tr>
                 </thead>
                 <tbody></tbody>

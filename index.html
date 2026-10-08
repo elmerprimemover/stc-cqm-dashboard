@@ -149,7 +149,6 @@
         to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Pulsing Green Animation for Duty */
     @keyframes greenPulse {
         0% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.4); }
         70% { box-shadow: 0 0 0 6px rgba(74, 222, 128, 0); }
@@ -1077,7 +1076,6 @@
             <button class="nav-tab-btn active" onclick="switchPage('dispatchBoardPage')">📊 Live Dashboard</button>
         </div>
 
-        <!-- NEW: Absentees / E-Leave Input Box -->
         <div class="absent-control-box">
             <label>Absentees / E-Leave / Off-Duty Override (Type Team Names e.g. Team 5)</label>
             <div class="absent-input-row">
@@ -1121,6 +1119,72 @@
                     <option value="CABLE LAYING (GREATER THAN 400M)">CABLE LAYING (GREATER THAN 400M)</option>
                     <option value="CABLE LAYING (LESS THAN 400M)">CABLE LAYING (LESS THAN 400M)</option>
                     <option value="ISOLATION & ENDORSE TO PRIMARY">ISOLATION & ENDORSE TO PRIMARY</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>MCT / ODN</label>
+                <select id="entryMctOdn" class="form-control">
+                    <option value="">Select MCT/ODN</option>
+                    <option value="MCT">MCT</option>
+                    <option value="ODN">ODN</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>PRIMARY / LASTMILE</label>
+                <select id="entryPrimaryLastmile" class="form-control">
+                    <option value="">Select Primary/Lastmile</option>
+                    <option value="PRIMARY">PRIMARY</option>
+                    <option value="LASTMILE">LASTMILE</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>CONTRACTOR</label>
+                <select id="entryContractor" class="form-control">
+                    <option value="">Select Contractor</option>
+                    <option value="IN-HOUSE">IN-HOUSE</option>
+                    <option value="THIRD-PARTY">THIRD-PARTY</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>FAULT TYPE</label>
+                <select id="entryFaultType" class="form-control">
+                    <option value="">Select Fault Type</option>
+                    <option value="CUT">CUT</option>
+                    <option value="HIGH ATTENUATION">HIGH ATTENUATION</option>
+                    <option value="NO LIGHT">NO LIGHT</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>TROUBLE TYPE</label>
+                <select id="entryTroubleType" class="form-control">
+                    <option value="">Select Trouble Type</option>
+                    <option value="AERIAL">AERIAL</option>
+                    <option value="UNDERGROUND">UNDERGROUND</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>CAUSE OF TROUBLE</label>
+                <select id="entryCauseOfTrouble" class="form-control">
+                    <option value="">Select Cause</option>
+                    <option value="VEHICLE HIT">VEHICLE HIT</option>
+                    <option value="VANDALISM">VANDALISM</option>
+                    <option value="RODENT">RODENT</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>SEGMENT</label>
+                <select id="entrySegment" class="form-control">
+                    <option value="">Select Segment</option>
+                    <option value="SPAN A">SPAN A</option>
+                    <option value="SPAN B">SPAN B</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>ACTION TAKEN</label>
+                <select id="entryActionTaken" class="form-control">
+                    <option value="">Select Action Taken</option>
+                    <option value="SPLICED">SPLICED</option>
+                    <option value="REPLACED CABLE">REPLACED CABLE</option>
                 </select>
             </div>
             <div style="display: flex; gap: 6px; margin-top: 12px;">

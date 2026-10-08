@@ -130,6 +130,19 @@
         to { opacity: 1; transform: translateY(0); }
     }
 
+    /* Fiber Signal Scanning Animation for KPI Card */
+    @keyframes fiberPulseGlow {
+        0% { box-shadow: 0 0 5px rgba(56, 189, 248, 0.2), inset 0 0 5px rgba(56, 189, 248, 0.1); border-color: var(--border-color); }
+        50% { box-shadow: 0 0 15px rgba(56, 189, 248, 0.5), inset 0 0 10px rgba(56, 189, 248, 0.25); border-color: var(--primary-blue); }
+        100% { box-shadow: 0 0 5px rgba(56, 189, 248, 0.2), inset 0 0 5px rgba(56, 189, 248, 0.1); border-color: var(--border-color); }
+    }
+
+    @keyframes lineScan {
+        0% { transform: translateX(-100%); opacity: 0.2; }
+        50% { opacity: 1; }
+        100% { transform: translateX(250%); opacity: 0.2; }
+    }
+
     .team-card {
         background: var(--surface-card);
         border: 1px solid var(--border-color);
@@ -207,6 +220,20 @@
         align-items: center;
         justify-content: center;
         text-align: center;
+        position: relative;
+        overflow: hidden;
+        animation: fiberPulseGlow 3s infinite ease-in-out;
+    }
+    .kpi-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 40px;
+        height: 2px;
+        background: var(--primary-blue);
+        box-shadow: 0 0 8px var(--primary-blue);
+        animation: lineScan 2.5s infinite linear;
     }
     .kpi-title {
         font-size: 0.65rem;
@@ -219,6 +246,7 @@
         color: var(--primary-blue);
         font-size: 1.6rem;
         font-weight: 800;
+        text-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
     }
 
     .province-card {
@@ -356,15 +384,15 @@
         font-size: 0.75rem;
     }
     th, td {
-    padding: 6px 8px;
-    border-bottom: 1px solid var(--border-color);
-    border-right: 1px solid rgba(55, 65, 81, 0.4);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis; /* Automatically cuts off long text with '...' */
-    height: 32px;
-    vertical-align: middle;
-}
+        padding: 6px 8px;
+        border-bottom: 1px solid var(--border-color);
+        border-right: 1px solid rgba(55, 65, 81, 0.4);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        height: 32px;
+        vertical-align: middle;
+    }
 
     th {
         background: #0f172a;
@@ -474,7 +502,6 @@
 
     function isRestDay(entityName) {
         const now = new Date();
-        const days = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRI", "SATURDAY"];
         const currentDayName = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"][now.getDay()];
         
         let normalizedKey = Object.keys(RD_SCHEDULES).find(k => k.replace(/\s+/g, '') === entityName.toUpperCase().replace(/\s+/g, ''));
@@ -1401,24 +1428,24 @@
         </div>
 
         <div class="table-container">
-    <table id="dispatchTable">
-        <thead>
-            <tr>
-<th style="width: 40px; text-align: center;"><input type="checkbox" onclick="toggleSelectAll(this)" title="Select All"></th>
-<th style="width: 90px;" onclick="sortTable(1)">Team ⇅</th>
-<th style="width: 110px;" onclick="sortTable(2)">Distance ⇅</th>
-<th style="width: 110px;" onclick="sortTable(3)">Status ⇅</th>
-<th style="width: 130px;" onclick="sortTable(4)">WO # ⇅</th>
-<th style="width: 110px;" onclick="sortTable(5)">Facility ⇅</th>
-<th style="width: 100px;" onclick="sortTable(6)">Slot/Port ⇅</th>
-<th style="width: 140px;" onclick="sortTable(7)">Coordinates ⇅</th>
-<th style="width: 70px;" onclick="sortTable(8)">Ageing ⇅</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
-</div>
+            <table id="dispatchTable">
+                <thead>
+                    <tr>
+                        <th style="width: 40px; text-align: center;"><input type="checkbox" onclick="toggleSelectAll(this)" title="Select All"></th>
+                        <th style="width: 90px;" onclick="sortTable(1)">Team ⇅</th>
+                        <th style="width: 110px;" onclick="sortTable(2)">Distance ⇅</th>
+                        <th style="width: 110px;" onclick="sortTable(3)">Status ⇅</th>
+                        <th style="width: 130px;" onclick="sortTable(4)">WO # ⇅</th>
+                        <th style="width: 110px;" onclick="sortTable(5)">Facility ⇅</th>
+                        <th style="width: 100px;" onclick="sortTable(6)">Slot/Port ⇅</th>
+                        <th style="width: 140px;" onclick="sortTable(7)">Coordinates ⇅</th>
+                        <th style="width: 70px;" onclick="sortTable(8)">Ageing ⇅</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <div id="toast" class="toast"></div>

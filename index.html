@@ -76,7 +76,6 @@
         background: var(--border-color);
     }
 
-    /* Absentees & E-Leave Input Box */
     .absent-control-box {
         background: var(--surface-card);
         border: 1px solid var(--border-color);
@@ -156,12 +155,6 @@
         100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
     }
 
-    @keyframes fiberPulseGlow {
-        0% { box-shadow: 0 0 5px rgba(56, 189, 248, 0.2), inset 0 0 5px rgba(56, 189, 248, 0.1); border-color: var(--border-color); }
-        50% { box-shadow: 0 0 15px rgba(56, 189, 248, 0.5), inset 0 0 10px rgba(56, 189, 248, 0.25); border-color: var(--primary-blue); }
-        100% { box-shadow: 0 0 5px rgba(56, 189, 248, 0.2), inset 0 0 5px rgba(56, 189, 248, 0.1); border-color: var(--border-color); }
-    }
-
     .team-card {
         background: var(--surface-card);
         border: 1px solid var(--border-color);
@@ -226,10 +219,9 @@
         border-radius: 3px;
         padding: 2px 1px;
     }
-    .metric-label { font-size: 0.45rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 1px; }
-    .metric-val { font-size: 0.68rem; font-weight: 700; color: var(--text-main); }
+    .metric-label { font-size: 0.42rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 1px; }
+    .metric-val { font-size: 0.65rem; font-weight: 700; color: var(--text-main); }
 
-    /* ULTRA-COMPACT Provincial Block */
     .province-card {
         background: var(--surface-card);
         border: 1px solid var(--border-color);
@@ -653,7 +645,7 @@
             } else {
                 let stats = teamStats[tName];
                 let prefix = (tName === "RESCUE 1") ? "RESCUE 1 -> DUTY  " : `${tName} ->   DUTY `;
-                lines.push(`${prefix}Dispatch: ${stats.dispatch} | Completed: ${stats.completed} | Pending: ${stats.pending}`);
+                lines.push(`${prefix}Dispatch: ${stats.dispatch} | Completed: ${stats.completed} | Surveyed: ${stats.surveyed} | Pending: ${stats.pending}`);
             }
         });
 
@@ -665,7 +657,7 @@
             lines.push(`   Ageing -> ${ageingSummary || 'None'}`);
         });
 
-        copyToClipboard(lines.join("\n"), `📋 Shift summary with ageing copied!`);
+        copyToClipboard(lines.join("\n"), `📋 Shift summary with surveyed metrics copied!`);
     }
 
     function filterTable() {
@@ -938,7 +930,6 @@
         let exactKPI = teamCount > 0 ? (completedOrPrimaryCount / teamCount).toFixed(2) : "0.01";
         let gridHtml = '';
 
-        // Render Team Cards
         teamNames.forEach((tName) => {
             let isAbsent = absentInputVal.includes(tName);
             let rest = isRestDay(tName);
@@ -964,7 +955,6 @@
             `;
         });
 
-        // Render KPI Card integrated as a grid card alongside teams
         gridHtml += `
             <div class="team-card kpi-integrated">
                 <div class="team-card-header">
@@ -975,7 +965,6 @@
             </div>
         `;
 
-        // Render Provincial Block
         let provinceCardHtml = `
             <div class="province-card">
                 <div class="province-card-title">Provincial Pending / Status & Ageing</div>

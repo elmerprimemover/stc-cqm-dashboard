@@ -481,6 +481,7 @@
         setInterval(updateLiveClock, 1000);
         document.getElementById("mainAppContent").classList.add("visible");
         syncWithGoogleSheets();
+        renderAttendanceTable();
     });
 
     function switchPage(pageId) {
@@ -995,6 +996,81 @@
         document.getElementById("dashGridContainer").innerHTML = gridHtml;
     }
 
+    function renderAttendanceTable() {
+        const tbody = document.querySelector("#attendanceTable tbody");
+        const headerRow = document.querySelector("#attendanceTable thead tr");
+        if (!tbody || !headerRow) return;
+
+        const daysInMonth = 31;
+        const year = 2026;
+        const month = 9; // October (0-indexed)
+        const currentDate = 10; // Dynamic up to Oct 10, 2026
+
+        let headerHtml = `<th style="width: 160px; position: sticky; left: 0; z-index: 11; background: #0f172a;">Personnel / Vehicle</th>`;
+        const dayNames = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+        
+        for (let d = 1; d <= Math.min(currentDate, daysInMonth); d++) {
+            let dateObj = new Date(year, month, d);
+            let dayName = dayNames[dateObj.getDay()];
+            headerHtml += `<th style="width: 60px;">${d} (${dayName})</th>`;
+        }
+        headerHtml += `<th style="width: 75px;">Actual</th><th style="width: 75px;">Required</th><th style="width: 65px;">Diff</th>`;
+        headerRow.innerHTML = headerHtml;
+
+        const personnelData = [
+            { team: "TEAM 1", restDay: "FRIDAY", members: ["JHON WENCY CRUZ", "MARK EVANGELISTA", "JADE ALLEN FUERTES"] },
+            { team: "TEAM 2", restDay: "TUESDAY", members: ["LAVA REYNANTE", "LAVA ROLANDO JR.", "LAVA CHRISTIAN LACERNA"] },
+            { team: "RESCUE 1", restDay: "MONDAY", members: ["MARK GABRIEL", "EDDIE GABRIEL", "JEFFREY GABRIEL"] },
+            { team: "VEHICLE LOGS", restDay: "", members: ["CAW 1628 *(Team 1)*", "CBM 7344 *(Team 2)*", "BFG 869 *(Rescue 1)*"] }
+        ];
+
+        let bodyHtml = "";
+
+        personnelData.forEach(group => {
+            bodyHtml += `
+                <tr style="background: rgba(56, 189, 248, 0.1); font-weight: 700;">
+                    <td colspan="${Math.min(currentDate, daysInMonth) + 4}" style="color: var(--primary-blue);">${group.team} ${group.restDay ? `(Rest Day: ${group.restDay})` : ''}</td>
+                </tr>
+            `;
+
+            group.members.forEach(name => {
+                let actualHours = 0;
+                let rowDaysHtml = "";
+
+                for (let d = 1; d <= Math.min(currentDate, daysInMonth); d++) {
+                    let dateObj = new Date(year, month, d);
+                    let dayName = dayNames[dateObj.getDay()];
+                    let isRD = group.restDay && group.restDay === dayName;
+                    let isAbsent = (group.team === "RESCUE 1" && d === 4); 
+
+                    if (isAbsent) {
+                        rowDaysHtml += `<td style="color: var(--badge-red-text);">ABSENT</td>`;
+                    } else if (isRD) {
+                        rowDaysHtml += `<td>RD</td>`;
+                    } else {
+                        rowDaysHtml += `<td>8</td>`;
+                        actualHours += 8;
+                    }
+                }
+
+                let requiredHours = 208;
+                let diff = actualHours - requiredHours;
+
+                bodyHtml += `
+                    <tr>
+                        <td style="position: sticky; left: 0; background: var(--surface-color);">${name}</td>
+                        ${rowDaysHtml}
+                        <td><b>${actualHours}</b></td>
+                        <td>${requiredHours}</td>
+                        <td style="color: var(--badge-red-text);">${diff}</td>
+                    </tr>
+                `;
+            });
+        });
+
+        tbody.innerHTML = bodyHtml;
+    }
+
     async function syncWithGoogleSheets() {
         let badge = document.getElementById("syncStatus");
         if (!badge) return;
@@ -1323,97 +1399,11 @@
             <table id="attendanceTable" style="min-width: 1400px;">
                 <thead>
                     <tr>
-                        <th style="width: 160px; position: sticky; left: 0; z-index: 11; background: #0f172a;">Personnel / Vehicle</th>
-                        <th style="width: 60px;">1 (THU)</th>
-                        <th style="width: 60px;">2 (FRI)</th>
-                        <th style="width: 60px;">3 (SAT)</th>
-                        <th style="width: 60px;">4 (SUN)</th>
-                        <th style="width: 60px;">5 (MON)</th>
-                        <th style="width: 60px;">6 (TUE)</th>
-                        <th style="width: 60px;">7 (WED)</th>
-                        <th style="width: 60px;">8 (THU)</th>
-                        <th style="width: 60px;">9 (FRI)</th>
-                        <th style="width: 75px;">Actual</th>
-                        <th style="width: 75px;">Required</th>
-                        <th style="width: 65px;">Diff</th>
+                        <!-- Dynamically generated columns up to October 10 -->
                     </tr>
                 </thead>
                 <tbody>
-                    <tr style="background: rgba(56, 189, 248, 0.1); font-weight: 700;">
-                        <td colspan="13" style="color: var(--primary-blue);">TEAM 1 (Rest Day: Friday)</td>
-                    </tr>
-                    <tr>
-                        <td style="position: sticky; left: 0; background: var(--surface-color);">JHON WENCY CRUZ</td>
-                        <td>8</td><td>RD</td><td>8</td><td>8</td><td>8</td><td>8</td><td>8</td><td>8</td><td>RD</td>
-                        <td><b>64</b></td><td>208</td><td style="color: var(--badge-red-text);">-144</td>
-                    </tr>
-                    <tr>
-                        <td style="position: sticky; left: 0; background: var(--surface-color);">MARK EVANGELISTA</td>
-                        <td>8</td><td>RD</td><td>8</td><td>8</td><td>8</td><td>8</td><td>8</td><td>8</td><td>RD</td>
-                        <td><b>64</b></td><td>208</td><td style="color: var(--badge-red-text);">-144</td>
-                    </tr>
-                    <tr>
-                        <td style="position: sticky; left: 0; background: var(--surface-color);">JADE ALLEN FUERTES</td>
-                        <td>8</td><td>RD</td><td>8</td><td>8</td><td>8</td><td>8</td><td>8</td><td>8</td><td>RD</td>
-                        <td><b>64</b></td><td>208</td><td style="color: var(--badge-red-text);">-144</td>
-                    </tr>
-
-                    <tr style="background: rgba(56, 189, 248, 0.1); font-weight: 700;">
-                        <td colspan="13" style="color: var(--primary-blue);">TEAM 2 (Rest Day: Tuesday)</td>
-                    </tr>
-                    <tr>
-                        <td style="position: sticky; left: 0; background: var(--surface-color);">LAVA REYNANTE</td>
-                        <td>8</td><td>8</td><td>8</td><td>8</td><td>8</td><td>RD</td><td>8</td><td>8</td><td>8</td>
-                        <td><b>64</b></td><td>208</td><td style="color: var(--badge-red-text);">-144</td>
-                    </tr>
-                    <tr>
-                        <td style="position: sticky; left: 0; background: var(--surface-color);">LAVA ROLANDO JR.</td>
-                        <td>8</td><td>8</td><td>8</td><td>8</td><td>8</td><td>RD</td><td>8</td><td>8</td><td>8</td>
-                        <td><b>64</b></td><td>208</td><td style="color: var(--badge-red-text);">-144</td>
-                    </tr>
-                    <tr>
-                        <td style="position: sticky; left: 0; background: var(--surface-color);">LAVA CHRISTIAN LACERNA</td>
-                        <td>8</td><td>8</td><td>8</td><td>8</td><td>8</td><td>RD</td><td>8</td><td>8</td><td>8</td>
-                        <td><b>64</b></td><td>208</td><td style="color: var(--badge-red-text);">-144</td>
-                    </tr>
-
-                    <tr style="background: rgba(56, 189, 248, 0.1); font-weight: 700;">
-                        <td colspan="13" style="color: var(--primary-blue);">RESCUE 1 (Rest Day: Monday)</td>
-                    </tr>
-                    <tr>
-                        <td style="position: sticky; left: 0; background: var(--surface-color);">MARK GABRIEL</td>
-                        <td>8</td><td>8</td><td>8</td><td style="color: var(--badge-red-text);">ABSENT</td><td>RD</td><td>8</td><td>8</td><td>8</td><td>8</td>
-                        <td><b>56</b></td><td>208</td><td style="color: var(--badge-red-text);">-152</td>
-                    </tr>
-                    <tr>
-                        <td style="position: sticky; left: 0; background: var(--surface-color);">EDDIE GABRIEL</td>
-                        <td>8</td><td>8</td><td>8</td><td style="color: var(--badge-red-text);">ABSENT</td><td>RD</td><td>8</td><td>8</td><td>8</td><td>8</td>
-                        <td><b>56</b></td><td>208</td><td style="color: var(--badge-red-text);">-152</td>
-                    </tr>
-                    <tr>
-                        <td style="position: sticky; left: 0; background: var(--surface-color);">JEFFREY GABRIEL</td>
-                        <td>8</td><td>8</td><td>8</td><td style="color: var(--badge-red-text);">ABSENT</td><td>RD</td><td>8</td><td>8</td><td>8</td><td>8</td>
-                        <td><b>56</b></td><td>208</td><td style="color: var(--badge-red-text);">-152</td>
-                    </tr>
-
-                    <tr style="background: rgba(56, 189, 248, 0.1); font-weight: 700;">
-                        <td colspan="13" style="color: var(--primary-blue);">VEHICLE LOGS</td>
-                    </tr>
-                    <tr>
-                        <td style="position: sticky; left: 0; background: var(--surface-color);">CAW 1628 *(Team 1)*</td>
-                        <td>8</td><td>RD</td><td>8</td><td>8</td><td>8</td><td>8</td><td>8</td><td>8</td><td>RD</td>
-                        <td><b>64</b></td><td>208</td><td style="color: var(--badge-red-text);">-144</td>
-                    </tr>
-                    <tr>
-                        <td style="position: sticky; left: 0; background: var(--surface-color);">CBM 7344 *(Team 2)*</td>
-                        <td>8</td><td>8</td><td>8</td><td>8</td><td>8</td><td>RD</td><td>8</td><td>8</td><td>8</td>
-                        <td><b>64</b></td><td>208</td><td style="color: var(--badge-red-text);">-144</td>
-                    </tr>
-                    <tr>
-                        <td style="position: sticky; left: 0; background: var(--surface-color);">BFG 869 *(Rescue 1)*</td>
-                        <td>8</td><td>8</td><td>8</td><td style="color: var(--badge-red-text);">ABSENT</td><td>RD</td><td>8</td><td>8</td><td>8</td><td>8</td>
-                        <td><b>56</b></td><td>208</td><td style="color: var(--badge-red-text);">-152</td>
-                    </tr>
+                    <!-- Dynamically populated via renderAttendanceTable() -->
                 </tbody>
             </table>
         </div>

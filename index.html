@@ -442,7 +442,7 @@
     .txt-modal h3 { color: var(--primary-blue); font-size: 0.85rem; margin-bottom: 6px; }
     .txt-modal textarea {
         width: 100%;
-        min-height: 140px;
+        min-height: 160px;
         background: var(--bg-color);
         color: var(--text-main);
         border: 1px solid var(--border-color);
@@ -728,6 +728,7 @@
             matchedTicket = hit;
             woInput.value = hit.wo;
             document.getElementById("entryStatus").value = hit.status || "";
+            document.getElementById("entryMaterials").value = hit.materials || "";
             document.getElementById("entryFacility").value = hit.troubleLocation || hit.affectedFacility || "";
             if (hit.team) {
                 let teamSelect = document.getElementById("entryTeam");
@@ -750,6 +751,7 @@
         document.getElementById("entryWoSearch").value = "";
         document.getElementById("entryFacility").value = "";
         document.getElementById("entryStatus").value = "";
+        document.getElementById("entryMaterials").value = "";
         document.getElementById("entryTeam").selectedIndex = 0;
         document.getElementById("entryWorkload").selectedIndex = 0;
         document.getElementById("entryMctOdn").selectedIndex = 0;
@@ -772,29 +774,39 @@
         const troubleLocation = data.facility || (matchedTicket && matchedTicket.troubleLocation) || (matchedTicket && matchedTicket.facility) || "";
         const segment = data.segment || (matchedTicket && matchedTicket.segment) || "";
         const actionTaken = data.actionTaken || (matchedTicket && matchedTicket.actionTaken) || "";
-        const pipeLine = [fault, affectedFacility, troubleType, causeOfTrouble, troubleLocation, segment, actionTaken].join("|");
-
+        
         let rawStatus = (data.status || (matchedTicket && matchedTicket.status) || "").toUpperCase();
-        let matMatch = rawStatus.match(/MATERIAL[S]?\s*USED[:\s]*(.*)/i);
-        let materialsText = matMatch ? matMatch[1].trim() : "";
         let statusClean = rawStatus.replace(/MATERIAL[S]?\s*USED.*$/i, "").trim();
-        let statusLine = "STATUS: " + statusClean;
-        let materialsLine = materialsText ? "MATERIALS USED: " + materialsText : "";
+        
+        const pipeLine = [fault, affectedFacility, troubleType, causeOfTrouble, troubleLocation, segment, actionTaken, statusClean].join("|");
+
+        let materialsInput = data.materials || document.getElementById("entryMaterials").value.trim();
+        let materialsLine = materialsInput ? "MATERIALS USED: " + materialsInput : "";
 
         const workload = data.workload || (matchedTicket && matchedTicket.workload) || " ";
         const mctOdn = data.mctOdn || (matchedTicket && matchedTicket.mctOdn) || " ";
-        const primaryLastmile = data.primaryLastmile || (matchedTicket && matchedTicket.primaryLastmile) || " ";
+        const primaryLastmile = data.primaryLastmile || document.getElementById("entryPrimaryLastmile").value || (matchedTicket && matchedTicket.primaryLastmile) || "";
         const contractor = data.contractor || (matchedTicket && matchedTicket.contractor) || "";
         const teamUnique = (matchedTicket && matchedTicket.teamUnique) || "";
         const lcp = (matchedTicket && matchedTicket.lcpCol) || "";
         const nap = (matchedTicket && matchedTicket.napCol) || "";
 
         const detailLine = [workload, mctOdn, primaryLastmile, contractor, teamUnique, lcp, nap].join("/");
-        const checkLine = "CHECK PHYSICAL/FOR RESTORATION BY PRIMARY/AFFECTED/" + troubleLocation + ((matchedTicket && matchedTicket.slotPort) ? " " + matchedTicket.slotPort : "");
+        
+        let lines = [];
+        lines.push("WORKORDER: " + wo);
+        lines.push("FAULT SOLUTION:");
+        lines.push(pipeLine);
+        
+        if (materialsLine) {
+            lines.push("");
+            lines.push(materialsLine);
+        }
+        
+        lines.push("");
+        lines.push("FAULT REASON:");
+        lines.push(detailLine);
 
-        let lines = ["WORKORDER: " + wo, pipeLine, statusLine];
-        if (materialsLine) lines.push(materialsLine);
-        lines.push("", detailLine, "", checkLine);
         return lines.join("\n");
     }
 
@@ -810,6 +822,7 @@
         let typedWo = document.getElementById("entryWoSearch").value.trim();
         let facility = document.getElementById("entryFacility").value.trim();
         let status = document.getElementById("entryStatus").value;
+        let materials = document.getElementById("entryMaterials").value.trim();
         let team = document.getElementById("entryTeam").value;
         let workload = document.getElementById("entryWorkload").value;
         let mctOdn = document.getElementById("entryMctOdn").value;
@@ -829,7 +842,13 @@
         typedWo = matchedWoExact;
         if (!team) team = (matchedTicket && matchedTicket.team) || "";
 
-        let payload = { action: "save", team: team, status: status, wo: typedWo, affectedFacility: facility, troubleLocation: facility };
+        let finalStatus = status;
+        if (materials) {
+            finalStatus += " MATERIALS USED: " + materials;
+        }
+
+        // Bypasses sending affectedFacility (Column O) to protect Column O values on Sheets
+        let payload = { action: "save", team: team, status: finalStatus, materials: materials, wo: typedWo, troubleLocation: facility };
         if (workload) payload.workload = workload;
         if (mctOdn) payload.mctOdn = mctOdn;
         if (primaryLastmile) payload.primaryLastmile = primaryLastmile;
@@ -841,7 +860,7 @@
         if (actionTaken) payload.actionTaken = actionTaken;
 
         const generatedText = buildUpdateText({
-            wo: typedWo, status: status, facility: facility, workload: workload,
+            wo: typedWo, status: finalStatus, materials: materials, facility: facility, workload: workload,
             mctOdn: mctOdn, primaryLastmile: primaryLastmile, contractor: contractor,
             faultType: faultType, troubleType: troubleType, causeOfTrouble: causeOfTrouble,
             segment: segment, actionTaken: actionTaken, team: team
@@ -1004,7 +1023,9 @@
         const daysInMonth = 31;
         const year = 2026;
         const month = 9; // October (0-indexed)
-        const currentDate = 10; // Dynamic up to Oct 10, 2026
+        
+        const now = new Date();
+        const currentDate = (now.getFullYear() === 2026 && now.getMonth() === 9) ? now.getDate() : daysInMonth;
 
         let headerHtml = `<th style="width: 160px; position: sticky; left: 0; z-index: 11; background: #0f172a;">Personnel / Vehicle</th>`;
         const dayNames = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
@@ -1014,7 +1035,7 @@
             let dayName = dayNames[dateObj.getDay()];
             headerHtml += `<th style="width: 60px;">${d} (${dayName})</th>`;
         }
-        headerHtml += `<th style="width: 75px;">Actual</th><th style="width: 75px;">Required</th><th style="width: 65px;">Diff</th>`;
+        headerHtml += `<th style="width: 75px;">Actual</th><th style="width: 75px;">Required</th><th style="width: 75px; color: var(--primary-blue);">Projected</th><th style="width: 65px;">Diff</th>`;
         headerRow.innerHTML = headerHtml;
 
         const personnelData = [
@@ -1029,40 +1050,65 @@
         personnelData.forEach(group => {
             bodyHtml += `
                 <tr style="background: rgba(56, 189, 248, 0.1); font-weight: 700;">
-                    <td colspan="${Math.min(currentDate, daysInMonth) + 4}" style="color: var(--primary-blue);">${group.team} ${group.restDay ? `(Rest Day: ${group.restDay})` : ''}</td>
+                    <td colspan="${Math.min(currentDate, daysInMonth) + 5}" style="color: var(--primary-blue);">${group.team} ${group.restDay ? `(Rest Day: ${group.restDay})` : ''}</td>
                 </tr>
             `;
 
             group.members.forEach(name => {
                 let actualHours = 0;
+                let requiredHoursToDate = 0;
+                let totalMonthlyRequired = 0;
                 let rowDaysHtml = "";
 
-                for (let d = 1; d <= Math.min(currentDate, daysInMonth); d++) {
+                for (let d = 1; d <= daysInMonth; d++) {
                     let dateObj = new Date(year, month, d);
                     let dayName = dayNames[dateObj.getDay()];
                     let isRD = group.restDay && group.restDay === dayName;
                     let isAbsent = (group.team === "RESCUE 1" && d === 4); 
+                    let customHours = null;
 
-                    if (isAbsent) {
-                        rowDaysHtml += `<td style="color: var(--badge-red-text);">ABSENT</td>`;
-                    } else if (isRD) {
-                        rowDaysHtml += `<td>RD</td>`;
-                    } else {
-                        rowDaysHtml += `<td>8</td>`;
-                        actualHours += 8;
+                    if (name === "MARK GABRIEL" && d === 4) {
+                        isAbsent = false;
+                        customHours = 4;
+                    }
+
+                    if (!isRD) {
+                        totalMonthlyRequired += 8;
+                    }
+
+                    if (d <= Math.min(currentDate, daysInMonth)) {
+                        if (!isRD) {
+                            requiredHoursToDate += 8;
+                        }
+
+                        if (isAbsent) {
+                            rowDaysHtml += `<td style="color: var(--badge-red-text);">ABSENT</td>`;
+                        } else if (customHours !== null) {
+                            rowDaysHtml += `<td style="color: #facc15;" title="Late / Partial Duty">${customHours}*</td>`;
+                            actualHours += customHours;
+                        } else if (isRD) {
+                            rowDaysHtml += `<td>RD</td>`;
+                        } else {
+                            rowDaysHtml += `<td>8</td>`;
+                            actualHours += 8;
+                        }
                     }
                 }
 
-                let requiredHours = 208;
-                let diff = actualHours - requiredHours;
+                let attendanceRate = requiredHoursToDate > 0 ? (actualHours / requiredHoursToDate) : 1;
+                let projectedHours = Math.round(attendanceRate * totalMonthlyRequired);
+                let fullMonthTarget = 208;
+                let diff = projectedHours - fullMonthTarget;
+                let diffColor = diff < 0 ? "var(--badge-red-text)" : "var(--badge-green-text)";
 
                 bodyHtml += `
                     <tr>
                         <td style="position: sticky; left: 0; background: var(--surface-color);">${name}</td>
                         ${rowDaysHtml}
                         <td><b>${actualHours}</b></td>
-                        <td>${requiredHours}</td>
-                        <td style="color: var(--badge-red-text);">${diff}</td>
+                        <td>${requiredHoursToDate}</td>
+                        <td style="color: var(--primary-blue); font-weight: 700;">${projectedHours}</td>
+                        <td style="color: ${diffColor}; font-weight: 700;">${diff}</td>
                     </tr>
                 `;
             });
@@ -1162,7 +1208,14 @@
                     <option value="TEAM 6">TEAM 6</option>
                 </select>
             </div>
-            <div class="form-group"><label>STATUS</label><input type="text" id="entryStatus" class="form-control" placeholder="Type status..."></div>
+            <div class="form-group">
+                <label>FAULT SOLUTION</label>
+                <input type="text" id="entryStatus" class="form-control" placeholder="Type fault solution...">
+            </div>
+            <div class="form-group">
+                <label>MATERIALS USED</label>
+                <input type="text" id="entryMaterials" class="form-control" placeholder="e.g., 2 pcs SC-UPC Connector, 15m FOC...">
+            </div>
             <div class="form-group"><label>TROUBLE LOCATION</label><input type="text" id="entryFacility" class="form-control" placeholder="Enter trouble location..."></div>
             
             <div class="form-group">
@@ -1391,7 +1444,7 @@
         <div class="form-container" style="max-width: 100%; margin-bottom: 8px;">
             <h3>Monthly Attendance & Billing Monitoring (Oct 1-31, 2026)</h3>
             <p style="font-size: 0.7rem; color: var(--text-muted); margin-bottom: 8px;">
-                Tracking personnel duty hours, rest days (RD), absences, and vehicle deployment logs (Team 1 and Rescue 1 separated).
+                Tracking personnel duty hours, rest days (RD), absences, partial hours/lates, and vehicle deployment logs.
             </p>
         </div>
 
@@ -1399,7 +1452,7 @@
             <table id="attendanceTable" style="min-width: 1400px;">
                 <thead>
                     <tr>
-                        <!-- Dynamically generated columns up to October 10 -->
+                        <!-- Dynamically generated columns up to current date -->
                     </tr>
                 </thead>
                 <tbody>
